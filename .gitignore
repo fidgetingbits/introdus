@@ -1,0 +1,9 @@
+.direnv
+.ruff_cache
+# From build command testing
+result
+
+/.pre-commit-config.yaml
+
+# Backup files for temporary changes
+*.bk
