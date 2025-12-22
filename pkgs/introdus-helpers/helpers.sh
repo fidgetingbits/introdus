@@ -74,8 +74,11 @@ function no_or_yes() {
 
 ### SOPS helpers
 
-nix_secrets_dir=${NIX_SECRETS_DIR:-"$(dirname "${BASH_SOURCE[0]}")/../../nix-secrets"}
-SOPS_FILE="${nix_secrets_dir}/.sops.yaml"
+if [ -z "${NIX_SECRETS_DIR+x}" ]; then
+    red "ERROR: The NIX_SECRETS_DIR variable must point to the absolute path of your nix-secrets folder"
+    red "You probably want to add it to your nixos-config shell.nix file"
+fi
+SOPS_FILE="${NIX_SECRETS_DIR}/.sops.yaml"
 
 # Updates the .sops.yaml file with a new host or user age key.
 function sops_update_age_key() {
@@ -174,8 +177,8 @@ function sops_setup_user_age_key() {
     target_user="$1"
     target_hostname="$2"
 
-    secret_file="${nix_secrets_dir}/sops/${target_hostname}.yaml"
-    config="${nix_secrets_dir}/.sops.yaml"
+    secret_file="${NIX_SECRETS_DIR}/sops/${target_hostname}.yaml"
+    config="${NIX_SECRETS_DIR}/.sops.yaml"
     # If the secret file doesn't exist, it means we're generating a new user key as well
     if [ ! -f "$secret_file" ]; then
         green "Host secret file does not exist. Creating $secret_file"
