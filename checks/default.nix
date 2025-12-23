@@ -7,7 +7,7 @@
 }:
 let
   lib = pkgs.lib;
-  introdusLib = self.lib.mkIntrodusLib lib { };
+  introdusLib = self.lib.mkIntrodusLib { inherit lib; };
 in
 rec {
   # NOTE: off for now to avoid build failure on empty dirs
