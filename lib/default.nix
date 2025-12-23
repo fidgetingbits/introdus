@@ -33,8 +33,9 @@ rec {
       path: lib.match "nixos.nix|darwin.nix|nixos|darwin" (leaf (builtins.toString path)) == null
     ) (scanPaths path);
 
+  # Expose a set of default hooks for use by external configs
   # NOTE: Hooks are run in alphabetical order
-  preCommitHooks = {
+  mkPreCommitHooks = pkgs: {
     # General
     check-added-large-files.enable = true;
     check-case-conflicts.enable = true;
@@ -53,7 +54,6 @@ rec {
         noLambdaArg = true;
       };
     };
-    # statix.enable = true;
 
     # shellscripts
     shfmt.enable = true;
@@ -69,13 +69,24 @@ rec {
 
     end-of-file-fixer.enable = true;
 
-    unwanted-builtins = {
-      enable = true;
-      name = "unwanted builtins function calls";
-      # FIXME: chaneg with a build package with it's own runtimeInputs
-      entry = "${./unwanted-builtins.sh}";
-      files = ".*";
-      language = "script";
-    };
+    unwanted-builtins =
+      let
+        unwantedScript = pkgs.writeShellApplication {
+          name = "unwanted-builtins.sh";
+          runtimeInputs = [ pkgs.ripgrep ];
+          text = ''
+            # Flag anything that isn't builtins-only
+            # WARNING: This list is incomplete. Things will have to be added to it overtime
+            rg -g "*.nix" "builtins" | rg -v '(toString|toFile|readDir|currentTime|getFlake|getEnv|isNull)'
+          '';
+        };
+      in
+      {
+        enable = true;
+        name = "unwanted builtins function calls";
+        entry = lib.getExe' unwantedScript "unwanted-builtins.sh";
+        files = ".*";
+        language = "script";
+      };
   };
 }

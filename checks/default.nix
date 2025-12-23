@@ -7,6 +7,7 @@
 }:
 let
   lib = pkgs.lib;
+  introdusLib = self.lib.mkIntrodusLib lib { };
 in
 rec {
   # NOTE: off for now to avoid build failure on empty dirs
@@ -25,7 +26,7 @@ rec {
   pre-commit-check = inputs.pre-commit-hooks.lib.${system}.run {
     src = ./.;
     default_stages = [ "pre-commit" ];
-    hooks = lib.recursiveUpdate self.lib.preCommitHooks {
+    hooks = lib.recursiveUpdate (introdusLib.mkPreCommitHooks pkgs) {
       destroyed-symlinks = {
         enable = true;
         name = "destroyed-symlinks";
