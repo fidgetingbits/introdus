@@ -17,6 +17,7 @@ in
 {
   default = pkgs.mkShell {
     NIX_CONFIG = "extra-experimental-features = nix-command flakes pipe-operators";
+    NIXPKGS_ALLOW_UNFREE = "1";
 
     inherit (checks.pre-commit-check) shellHook;
     buildInputs = checks.pre-commit-check.enabledPackages;
