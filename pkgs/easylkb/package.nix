@@ -89,7 +89,7 @@ pkgs.writeShellApplication {
         qemu
         ;
     })
-    pkgs.unstable.debootstrap # unstable important for zstd support
+    pkgs.debootstrap
     pkgs.linux.nativeBuildInputs
   ];
   # propagatedBuildInputs =  lib.attrValues {inherit (pkgs) gdb;};

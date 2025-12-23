@@ -9,9 +9,9 @@ let
     pkgs.jq
     pkgs.jtbl
     pkgs.fzf
-    # FIXME: This should ideally use whatever version of hyprland is already installed,
-    # but config.programs.hyprland.package isn't working
-    pkgs.unstable.hyprland
+    # FIXME: This should somehow use whatever version of hyprland is already in
+    # use elsewhere by the user
+    (if (pkgs ? unstable) then pkgs.unstable.hyprland else pkgs.hyprland)
   ];
 in
 writeShellScriptBin "hypr-binds" (
