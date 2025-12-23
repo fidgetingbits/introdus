@@ -1,4 +1,9 @@
-{ stdenv, pkgs, ... }:
+{
+  stdenv,
+  pkgs,
+  lib,
+  ...
+}:
 stdenv.mkDerivation {
   name = "neovim-python-scripts";
   buildInputs = [ (pkgs.python3.withPackages (pythonPackages: lib.attrValues { })) ];
