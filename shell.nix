@@ -31,6 +31,8 @@ in
         pre-commit
         deadnix
         ripgrep
+        cocogitto
+        forgejo-runner
         ;
     };
   };
