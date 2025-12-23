@@ -15,8 +15,7 @@
         overlays = import ./overlays { inherit inputs lib; };
         # Builds the introdus library for use in an external flake
         lib = {
-          mkLib = lib: secrets: import ./lib { inherit lib secrets; };
-          preCommitHooks = import ./checks/hooks.nix;
+          mkIntrodusLib = lib: secrets: import ./lib { inherit lib secrets; };
         };
         nixosModules = {
           default = self.nixosModules.introdus;
