@@ -7,6 +7,7 @@ lib.mkIf config.programs.git.enable {
         "gist.github.com"
         "gitlab.com"
         "codeberg.org"
+        "sr.ht"
       ];
     in
     urls
@@ -15,6 +16,7 @@ lib.mkIf config.programs.git.enable {
         pushInsteadOf = [ "https://${host}" ];
       };
     })
-    |> lib.mergeAttrsList
-    |> lib.optionalAttrs (!config.hostSpec.isMinimal);
+    |> lib.mergeAttrsList;
+  # FIXME: Remove this once we confirm the iso doesn't matter
+  # |> lib.optionalAttrs (!config.hostSpec.isMinimal);
 }
