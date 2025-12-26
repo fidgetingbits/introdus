@@ -35,6 +35,14 @@ rec {
         entry = "${inputs.pre-commit-hooks.checks.${system}.pre-commit-hooks}/bin/destroyed-symlinks";
         types = [ "symlink" ];
       };
+      conventional-commit-lint = {
+        enable = true;
+        name = "conventional-commit-lint";
+        description = "ensure commit follows conventional commit specification.";
+        stages = [ "commit-msg" ];
+        entry = "${lib.getExe' pkgs.cocogitto "cog"} verify -f";
+        language = "script";
+      };
     };
   };
 }
