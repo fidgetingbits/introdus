@@ -1,0 +1,19 @@
+name: lint
+
+on: [pull_request]
+jobs:
+  # https://github.com/cocogitto/cocogitto-action
+  cog_check_job:
+    runs-on: codeberg-tiny
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          # https://forgejo.org/docs/next/user/actions/reference/#forgejo
+          # pick the pr HEAD instead of the merge commit
+          ref: ${{ forgejo.event.pull_request.head.sha }}
+
+      - name: Conventional commit check
+        uses: cocogitto/cocogitto-action@v4
+        with:
+          command: check
