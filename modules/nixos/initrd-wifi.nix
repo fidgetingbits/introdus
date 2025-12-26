@@ -36,7 +36,6 @@ in
     };
   };
   config = lib.mkIf cfg.enable {
-
     boot.initrd =
       let
         confPath = "/etc/wpa_supplicant/wpa_supplicant-${cfg.interface}.conf";
