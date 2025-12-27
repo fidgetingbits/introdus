@@ -2,7 +2,7 @@
 # Make it easier to quickly find hyprland bindings
 # Originally found here: https://github.com/Eduruiz/dotfiles/blob/main/scripts/.config/scripts/hypr-binds/hypr-binds.sh
 hyprctl binds -j |
-	jq -r '
+  jq -r '
         map({
             modkey: .modmask | tostring,
             key: .key,
@@ -25,5 +25,5 @@ hyprctl binds -j |
         } [.] )
         | sort_by(.modkey)
     ' |
-	jtbl -n --fancy |
-	fzf --layout=reverse-list
+  jtbl -n --fancy |
+  fzf --layout=reverse-list
