@@ -28,5 +28,4 @@ jobs:
             --show-trace \
             --keep-going \
             --print-build-logs \
-            --max-jobs 1 \
-            --cores 1
+            --max-jobs 1
