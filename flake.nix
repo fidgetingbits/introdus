@@ -5,6 +5,7 @@
       self,
       nixpkgs,
       flake-parts,
+      treefmt-nix,
       ...
     }@inputs:
     let
@@ -42,22 +43,28 @@
             inherit system;
             overlays = [ self.overlays.default ];
           };
+          treefmtEval = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
         in
         rec {
           packages = lib.packagesFromDirectoryRecursive {
             callPackage = lib.callPackageWith pkgs;
             directory = ./pkgs;
           };
-          checks = import ./checks {
-            inherit
-              self
-              inputs
-              pkgs
-              system
-              lib
-              ;
-          };
-          formatter = pkgs.nixfmt;
+          checks =
+            import ./checks {
+              inherit
+                self
+                inputs
+                pkgs
+                system
+                lib
+                ;
+            }
+            // {
+              formatting = treefmtEval.config.build.check self;
+            };
+
+          formatter = treefmtEval.config.build.wrapper;
           devShells = import ./shell.nix {
             inherit
               checks
@@ -75,6 +82,10 @@
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     pre-commit-hooks = {
       url = "github:cachix/git-hooks.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    treefmt-nix = {
+      url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
