@@ -8,7 +8,7 @@ jobs:
   lints:
     strategy:
       fail-fast: false
-    runs-on: codeberg-small
+    runs-on: codeberg-medium
     env:
       NIXPKGS_ALLOW_UNFREE: 1
     steps:
@@ -28,4 +28,5 @@ jobs:
             --show-trace \
             --keep-going \
             --print-build-logs \
-            --max-jobs 1
+            --max-jobs 1 \
+            --cores 1
