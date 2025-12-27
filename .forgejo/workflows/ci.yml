@@ -8,7 +8,7 @@ jobs:
   lints:
     strategy:
       fail-fast: false
-    runs-on: codeberg-tiny
+    runs-on: codeberg-small
     env:
       NIXPKGS_ALLOW_UNFREE: 1
     steps:
