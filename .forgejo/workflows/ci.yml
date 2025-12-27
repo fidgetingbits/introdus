@@ -1,19 +1,25 @@
-name: lint
-
-on: [pull_request]
+name: Checks
+on:
+  push:
+    branches: main
+  pull_request:
+  merge_group:
 jobs:
-  # https://github.com/cocogitto/cocogitto-action
-  cog_check_job:
+  lints:
+    strategy:
+      fail-fast: false
     runs-on: codeberg-tiny
+    env:
+      NIXPKGS_ALLOW_UNFREE: 1
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          # https://forgejo.org/docs/next/user/actions/reference/#forgejo
-          # pick the pr HEAD instead of the merge commit
-          ref: ${{ forgejo.event.pull_request.head.sha }}
-
-      - name: Conventional commit check
-        uses: https://github.com/cocogitto/cocogitto-action@v4
+      - uses: https://github.com/cachix/install-nix-action@v31
         with:
-          command: check
+          nix_path: nixpkgs=channel:nixos-unstable
+          extra_nix_config: |
+            extra-experimental-features = nix-command flakes pipe-operators
+            accept-flake-config = true
+      - name: Run `nix flake check`
+        run: nix flake check --impure --show-trace --keep-going --print-build-logs
