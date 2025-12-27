@@ -22,4 +22,10 @@ jobs:
             extra-experimental-features = nix-command flakes pipe-operators
             accept-flake-config = true
       - name: Run `nix flake check`
-        run: nix flake check --impure --show-trace --keep-going --print-build-logs
+        run: |
+          nix flake check \
+            --impure \
+            --show-trace \
+            --keep-going \
+            --print-build-logs \
+            --max-jobs 1
