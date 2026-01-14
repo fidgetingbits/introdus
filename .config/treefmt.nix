@@ -3,6 +3,7 @@
   projectRootFile = "flake.nix";
   programs = {
     nixfmt.enable = true; # nix
+    ruff.enable = true; # python
     shfmt = {
       enable = true;
       indent_size = 4; # Seems not to pick up .editorconfig?
