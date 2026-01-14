@@ -1,7 +1,8 @@
 { lib, ... }:
 {
-  # Expose a set of default hooks for use by external configs
-  # Note formatting changes are done by treefmt (see treefmt.nix), linting checks are done by pre-commit
+  # Expose a set of default hooks for use by external configs Note formatting
+  # changes are done by treefmt (see .config/treefmt.nix), linting checks are
+  # done by pre-commit
   # NOTE: Hooks are run in alphabetical order
   mkPreCommitHooks = pkgs: formatter: {
     # General
