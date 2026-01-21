@@ -3,13 +3,15 @@
 # signing. It relies on ssh key signing only.
 
 # When using auth this expects a yubikey should be used. Touching shouldn't be
-# required for most repos that don't actually need auth, but we want it for ones we are doing
-# dev on. Solution is to hardcode repos that require auth and default to ssh for those only
+# required for most repos that don't actually need auth, but we want it for
+# ones we are doing dev on. Solution is to hardcode repos that require auth and
+# default to ssh for those only
 
 {
   config,
   osConfig,
   lib,
+  pkgs,
   ...
 }:
 let
@@ -84,7 +86,7 @@ in
         # FIXME: Make the type more strict
         type = lib.types.attrsOf lib.types.anything;
         description = "";
-        # FIXME: add a check to ensure primary and work exist in the same
+        # FIXME: add a check to ensure primary and work exist in the set
       };
       devFolders = lib.mkOption {
         type = lib.types.listOf lib.types.str;
@@ -132,7 +134,8 @@ in
         # FIXME: Test this is still true after changes
         description = ''
           List of work servers to include ssh insteadOf url substitutions for.
-                  If you want to swap an entire server, leave the repo part an empty string'';
+          If you want to swap an entire server, leave the repo part an empty string
+        '';
       };
       # FIXME: Make this is a list of paths that we check all of for the presence of the specified keys?
       # or just take absolute paths for keys and ditch this option?
@@ -169,16 +172,22 @@ in
 
   config = lib.mkIf cfg.enable {
     programs.git = {
+
+      aliases = {
+        wa = "! ${lib.getExe pkgs.introdus.git-worktree-add}";
+      };
+
       settings = {
         user = {
           name = cfg.handle; # Default name for all git operations
           email = cfg.email.git.primary; # # Default email for all git operations
           signingkey = "${cfg.publicKey}";
         };
-        # FIXME: Could consider this type of stuff moving elsewhere, and focus
-        # this module ONLY on insteadOf type rules and signing
         init.defaultBranch = "main";
         pull.rebase = "true";
+        push.autoSetupRemote = true;
+        remote.origin.prune = true;
+        rebase.autoStash = true;
 
         # Don't warn on empty git add calls. Because of "git re-commit" automation
         advice.addEmptyPathspec = false;
@@ -236,53 +245,122 @@ in
       };
     };
 
-    programs.zsh.initContent = ''
-      # git can't handle ssh-add -L output with a yubikey sk-ssh entry,
-      # so we alias git here to force it to use the ssh-agent output
-      if [[ -n $SSH_CONNECTION ]]; then
-          TEMP_KEY=$(mktemp)
-          ssh-add -L | head -n 1 >"$TEMP_KEY"
-          alias git="git -c user.signingKey=$TEMP_KEY"
-      fi
-    '';
-
-    home.file.".ssh/allowed_signers".text =
-      let
-        # FIXME: This should integrate cfg.devMails and check cfg.usePrivateEmails
-        devEmails = lib.mapAttrsToList (name: value: forgeEmail name value) forges;
-        # If email.work is set and not set it to "", returns a list of said emails
-        workEmail =
-          if (cfg.email ? work) then
-            if (lib.isList cfg.email.work) then
-              cfg.email.work
-            else
-              lib.flatten [
-                (lib.filter (n: n != "") [ cfg.email.work ])
-              ]
-          else
-            [ ];
-        genGitEmailKeys =
-          emails: keys:
-          lib.concatMapStringsSep "\n" (
-            key:
-            let
-              signers =
-                emails
-                |> lib.filter (s: s != "")
-                # nixfmt hack
-                |> lib.concatStringsSep ",";
-              keyContent =
-                "${cfg.keysPath}/${key}"
-                |> lib.custom.relativeToRoot
-                # nixfmt hack
-                |> lib.fileContents;
-            in
-            ''${signers} namespaces="git" ${keyContent}\n''
-          ) keys;
-      in
-      ''
-        ${genGitEmailKeys devEmails cfg.devKeys};
-        ${genGitEmailKeys workEmail cfg.workKeys}
+    programs.zsh = {
+      initContent = ''
+        # git can't handle ssh-add -L output with a yubikey sk-ssh entry,
+        # so we alias git here to force it to use the ssh-agent output
+        if [[ -n $SSH_CONNECTION ]]; then
+            export GIT_EDITOR="vim"
+            TEMP_KEY=$(mktemp)
+            ssh-add -L | head -n 1 >"$TEMP_KEY"
+            alias git="git -c user.signingKey=$TEMP_KEY"
+        fi
       '';
+      shellAliases = {
+        # git commit
+        gcm = "git commit -m";
+        gcmcf = "git commit -m 'chore: update flake.lock'";
+        gca = "git commit --amend";
+        gcan = "git commit --amend --no-edit";
+        gcam = "git commit --amend -m";
+        gcnv = "git commit --no-verify";
+
+        # git restore
+        gr = "git restore";
+        gra = "git restore :/";
+        grs = "git restore --staged";
+        grsa = "git restore --staged :/";
+
+        # git add
+        ga = "git add";
+        gau = "git add --update";
+        # Only add updates to files that are already staged
+        gas = "git add --update $(git diff --name-only --cached)";
+        # "git add again" - Re-add changes for anything that was already
+        # staged. Useful for pre-commit changes, etc
+        gaa = "git update-index --again";
+
+        # git status
+        gs = "git status --untracked-files=no";
+        gsa = "git status";
+        gst = "git stash";
+        gstp = "git stash pop";
+
+        # git switch
+        gsw = "git switch";
+        gswc = "git switch -c";
+        gco = "git checkout";
+
+        # git fetch
+        gf = "git fetch";
+        gfa = "git fetch --all";
+        gfu = "git fetch upstream";
+        gfm = "git fetch origin master";
+
+        # git diff
+        gds = "git diff --staged";
+        gd = "git diff";
+
+        # git push
+        gp = "git push";
+        gpf = "git push --force-with-lease";
+
+        # git cherry-pick
+        gcp = "git cherry-pick";
+        gcpc = "git cherry-pick --continue";
+        gcps = "git cherry-pick --skip";
+        gcpa = "git cherry-pick --abort";
+
+        # others
+        gl = "git log";
+        glo = "git log --oneline";
+        gc = "git clone";
+        grst = "git reset --soft ";
+        gsr = "git fetch && git rebase"; # "git smart rebase"
+      };
+    };
+
+    home = {
+      file.".ssh/allowed_signers".text =
+        let
+          # FIXME: This should integrate cfg.devMails and check cfg.usePrivateEmails
+          devEmails = lib.mapAttrsToList (name: value: forgeEmail name value) forges;
+          # If email.work is set and not set it to "", returns a list of said emails
+          workEmail =
+            if (cfg.email ? work) then
+              if (lib.isList cfg.email.work) then
+                cfg.email.work
+              else
+                lib.flatten [
+                  (lib.filter (n: n != "") [ cfg.email.work ])
+                ]
+            else
+              [ ];
+          genGitEmailKeys =
+            emails: keys:
+            lib.concatMapStringsSep "\n" (
+              key:
+              let
+                signers =
+                  emails
+                  |> lib.filter (s: s != "")
+                  # nixfmt hack
+                  |> lib.concatStringsSep ",";
+                keyContent =
+                  "${cfg.keysPath}/${key}"
+                  |> lib.custom.relativeToRoot
+                  # nixfmt hack
+                  |> lib.fileContents;
+              in
+              ''${signers} namespaces="git" ${keyContent}\n''
+            ) keys;
+        in
+        ''
+          ${genGitEmailKeys devEmails cfg.devKeys};
+          ${genGitEmailKeys workEmail cfg.workKeys}
+        '';
+      sessionVariables.GIT_EDITOR = osConfig.hostSpec.defaultEditor;
+    };
   };
+
 }
