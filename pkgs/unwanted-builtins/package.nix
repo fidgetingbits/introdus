@@ -5,13 +5,18 @@
   ...
 }:
 let
-
+  # impureBuiltins show up in the repl, but not in `lib.attrNames builtins`
+  # when generating the script. Not _entirely_ sure why
+  impureBuiltins = [
+    "currentTime"
+    "currentSystem"
+  ];
   allLibNames =
     lib.mapAttrsRecursive (path: value: if (lib.isFunction value) then path else null) lib
     |> lib.attrNames
     |> lib.filter (x: !(builtins.isNull x));
   regexPattern =
-    lib.attrNames builtins
+    (lib.attrNames builtins ++ impureBuiltins)
     |> lib.filter (b: !(lib.elem b allLibNames))
     # nixfmt hack
     |> lib.concatStringsSep "|";
