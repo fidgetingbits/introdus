@@ -83,11 +83,7 @@ elif git ls-remote --exit-code --heads origin "$BRANCH_NAME" >/dev/null 2>&1; th
 # 3. Brand new branch
 else
     echo "Creating worktree for new local branch: $BRANCH_NAME"
-    # Use the first existing worktree's branch as base, or fallback to origin/main
-    BASE_BRANCH=$(git worktree list --porcelain | grep "branch refs/heads/" | head -1 | sed 's/branch refs\/heads\///')
-    if [ -z "$BASE_BRANCH" ]; then
-        BASE_BRANCH="origin/main"
-    fi
+    BASE_BRANCH="origin/main"
     git worktree add -b "$BRANCH_NAME" "$BRANCH_NAME" "$BASE_BRANCH"
     echo "Remember to 'git push -u origin $BRANCH_NAME' when ready to push"
 fi
