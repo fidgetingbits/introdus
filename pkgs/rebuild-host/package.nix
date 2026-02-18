@@ -42,7 +42,7 @@ stdenvNoCC.mkDerivation (
           reference_lock=()
           if "$PER_HOST_LOCKS"; then
             reference_lock+=("--reference-lock-file" "locks/$HOST.lock")
-            trap cleanup_flake_lock EXIT HUP INT QUIT TERM
+            trap cleanup_flake_lock EXIT
           fi
           if [ "$HOST" != "$(hostname)" ]; then
             # FIXME: Double check if we can use nh for this?
