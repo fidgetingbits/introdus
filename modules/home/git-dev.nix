@@ -225,14 +225,21 @@ in
               inherit contents;
             }) paths;
           mapRemotes =
-            remotes:
-            lib.mapAttrsToList (name: value: {
-              condition = "hasconfig:remote.*.url:**/*${name}/**";
-              contents = {
-                user.email = (forgeEmail name value);
+            let
+              mkInclude = name: value: cond: {
+                condition = cond;
+                contents.user.email = (forgeEmail name value);
               };
-            }) remotes;
-
+            in
+            remotes:
+            remotes
+            |> lib.mapAttrsToList (
+              name: value: [
+                (mkInclude name value "hasconfig:remote.*.url:**/*${name}/**")
+                (mkInclude name value "hasconfig:remote.*.url:git@${name}:*/**")
+              ]
+            )
+            |> lib.flatten;
         in
         # Order matters. Last match wins, so we want granular email changes last
         (mapFolders cfg.devFolders privateGitConfig)
@@ -356,7 +363,7 @@ in
             ) keys;
         in
         ''
-          ${genGitEmailKeys devEmails cfg.devKeys};
+          ${genGitEmailKeys devEmails cfg.devKeys}
           ${genGitEmailKeys workEmail cfg.workKeys}
         '';
       sessionVariables.GIT_EDITOR = osConfig.hostSpec.defaultEditor;
