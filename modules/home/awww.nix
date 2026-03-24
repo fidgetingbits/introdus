@@ -6,63 +6,72 @@
   ...
 }:
 let
-  inherit (lib) mkIf mkOption types;
   cfg = config.introdus.services.awww;
 in
 {
   options.introdus.services.awww = {
     enable = lib.mkEnableOption "Enable awww services";
-    interval = mkOption {
-      type = types.int;
+    interval = lib.mkOption {
+      type = lib.types.int;
       default = (60 * 60); # Hourly
       description = "Interval value for cycling between images";
     };
 
-    cyclePerMonitor = mkOption {
+    cyclePerMonitor = lib.mkOption {
       type = lib.types.bool;
       default = true;
       description = "Set a different image per monitor";
     };
 
-    transitionFPS = mkOption {
-      type = types.int;
+    transitionFPS = lib.mkOption {
+      type = lib.types.int;
       default = 144;
       description = "Transition frames per second";
     };
 
-    transitionStep = mkOption {
-      type = types.int;
+    transitionStep = lib.mkOption {
+      type = lib.types.int;
       default = 2;
       description = "Transition step value";
     };
 
-    transitionTypes = mkOption {
-      type = types.listOf types.str;
+    transitionTypes = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
       default = [ "random" ];
       description = "Transition animation types";
     };
 
-    transitionDuration = mkOption {
-      type = types.float;
+    transitionDuration = lib.mkOption {
+      type = lib.types.float;
       default = 1.5;
       description = "Duration of animation";
     };
 
-    transitionAngles = mkOption {
-      type = types.listOf types.int;
+    transitionAngles = lib.mkOption {
+      type = lib.types.listOf lib.types.int;
       default = lib.genList (x: x * 15) (builtins.div 360 15);
       description = "Angle of transition for specific animations";
     };
 
-    wallpaperDir = mkOption {
-      type = types.str;
+    wallpaperDir = lib.mkOption {
+      type = lib.types.str;
       default = "";
       description = "Path to the directory of wallpaper images";
     };
   };
 
-  config = mkIf cfg.enable {
+  config = lib.mkIf cfg.enable {
     services.swww.enable = true;
+    # Delay starting so WAYLAND_DISPLAY is setup via uwsm
+    systemd.user.services.swww = {
+      Unit = {
+        PartOf = [
+          config.wayland.systemd.target
+        ];
+        After = [ config.wayland.systemd.target ];
+      };
+    };
+
     services.hyprpaper.enable = lib.mkForce false;
     stylix.targets.hyprpaper.enable = lib.mkForce false;
 
@@ -70,24 +79,21 @@ in
       # Skip current wallpaper
       awww-cycle = "systemctl --user kill --signal SIGUSR1 awww-cycle.service";
     };
-    systemd.user.services.awww-cycle = mkIf (cfg.wallpaperDir != "") {
+    systemd.user.services.awww-cycle = lib.mkIf (cfg.wallpaperDir != "") {
       Unit = {
         Description = "Cycle wallpaper images using awww";
-        PartOf = [
-          "graphical-session.target"
-        ];
-        Wants = [ "swww.service" ];
-        After = [
-          "swww.service"
-          "graphical-session.target"
-        ];
+        PartOf = [ "swww.service" ];
+        After = [ config.wayland.systemd.target ];
+      };
+      Install = {
+        WantedBy = [ "swww.service" ];
       };
 
       Service =
         let
           awww-cycle = pkgs.writeShellApplication {
             name = "awww-cycle";
-            runtimeInputs = lib.attrValues { inherit (pkgs) coreutils swww; };
+            runtimeInputs = lib.attrValues { inherit (pkgs) coreutils swww systemdMinimal; };
             text = ''
               function skip() {
                 swww query | while read -r line; do
@@ -104,6 +110,11 @@ in
 
               function wait_awww() {
                 echo "Checking awww daemon is up"
+                # Since ConditionEnvironment=WAYLAND_DISPLAY doesn't want to work
+                while ! systemctl --user show-environment | grep -q WAYLAND_DISPLAY; do
+                    sleep 1;
+                done
+
                 # while ! swww query 2>/dev/null; do
                 while ! swww query ; do
                   # Handle: 'Error: "Socket file not found. Are you sure swww-daemon is running?"'
@@ -154,14 +165,12 @@ in
         in
         {
           Type = "simple";
-          Restart = "always";
-          RestartSec = 1;
+          Restart = "on-failure";
+          # Restart = "always";
+          # RestartSec = 1;
           ExecStart = "${lib.getExe pkgs.uwsm} app -- ${lib.getExe awww-cycle}";
         };
 
-      Install = {
-        WantedBy = [ "graphical-session.target" ];
-      };
     };
 
     assertions = [
