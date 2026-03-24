@@ -45,6 +45,13 @@
             inherit system;
             overlays = [
               self.overlays.default
+              # Inject stable nixos pkgs for use by some packages (eg: unwanted-builtins)
+              (final: prev: {
+                stable = import inputs.nixpkgs-stable {
+                  system = final.stdenv.hostPlatform.system;
+                  config.allowUnfree = true;
+                };
+              })
             ];
           };
         in
@@ -95,8 +102,13 @@
         };
     };
   inputs = {
-    flake-parts.url = "github:hercules-ci/flake-parts";
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-25.11";
+    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
+    flake-parts = {
+      url = "github:hercules-ci/flake-parts";
+      inputs.nixpkgs-lib.follows = "nixpkgs";
+    };
     pre-commit-hooks = {
       url = "github:cachix/git-hooks.nix";
       inputs.nixpkgs.follows = "nixpkgs";
