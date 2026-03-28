@@ -1,4 +1,5 @@
 {
+  inputs,
   ...
 }:
 let
@@ -8,6 +9,13 @@ let
       introdus = prev.lib.packagesFromDirectoryRecursive {
         callPackage = final.lib.callPackageWith final;
         directory = ../pkgs;
+      };
+
+      # Some packages like unwanted-builtins need pkgs.stable when introdus is
+      # used as a module
+      stable = import inputs.nixpkgs-stable {
+        system = final.stdenv.hostPlatform.system;
+        config.allowUnfree = true;
       };
     };
   };
