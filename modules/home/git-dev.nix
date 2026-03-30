@@ -366,7 +366,13 @@ in
           ${genGitEmailKeys devEmails cfg.devKeys}
           ${genGitEmailKeys workEmail cfg.workKeys}
         '';
-      sessionVariables.GIT_EDITOR = osConfig.hostSpec.defaultEditor;
+
+      sessionVariables = {
+        # FIXME: This should add a test for when we have a
+        # flag for if neovim is used for git editor and
+        # similar
+        GIT_EDITOR = lib.optionalString config.introdus.neovim.enable osConfig.hostSpec.defaultEditor;
+      };
     };
   };
 
