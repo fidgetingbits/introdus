@@ -1,14 +1,34 @@
 {
-  stdenv,
   pkgs,
   lib,
+  makeWrapper,
+  python3Packages,
   ...
 }:
-stdenv.mkDerivation {
+python3Packages.buildPythonApplication rec {
   name = "neovim-python-scripts";
-  buildInputs = [ (pkgs.python3.withPackages (pythonPackages: lib.attrValues { })) ];
+  version = "0.0.1";
+  format = "other";
+  buildInputs = [
+    makeWrapper
+    (pkgs.python3.withPackages (pythonPackages: lib.attrValues { }))
+  ];
   dontUnpack = true;
+
   installPhase = ''
-    install -Dm755 ${./json2nix.py} $out/bin/json2nix
+    runHook preInstall
+    mkdir -p $out/share/
+    install -Dm755 ${./json2nix.py} $out/share/json2nix.py
+    runHook postInstall
+  '';
+
+  fixupPhase = ''
+    runHook preFixup
+
+    makeWrapper ${python3Packages.python}/bin/python "$out/bin/json2nix" \
+      --set PYTHONPATH "$PYTHONPATH" \
+      --add-flags "$out/share/json2nix.py"
+
+    runHook postFixup
   '';
 }

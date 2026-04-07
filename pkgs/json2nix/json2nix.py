@@ -74,23 +74,26 @@ def fmt_any(o, flatten):
 
 def main():
     flatten = "--flatten" in sys.argv
-    args = [a for a in sys.argv[1:] if not a.startswith("--")]
-
-    if len(args) < 1:
+    if "-h" in sys.argv or "--help" in sys.argv:
         print(f"Usage: {sys.argv[0]} [--flatten] <file.json>", file=sys.stderr)
         sys.exit(1)
 
-    with open(args[0], "r") as f:
-        contents = f.read().strip()
-        if contents[-1] == ",":
-            contents = contents[:-1]
-        if contents[0] != "{":
-            contents = "{" + contents + "}"
-        data = json.loads(strip_comments(contents))
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+
+    if len(args) < 1:
+        contents = sys.stdin.read().strip()
+    else:
+        with open(args[0], "r") as f:
+            contents = f.read().strip()
+
+    if contents[-1] == ",":
+        contents = contents[:-1]
+    if contents[0] != "{":
+        contents = "{" + contents + "}"
+    data = json.loads(strip_comments(contents))
 
     outputs = fmt_any(data, flatten=flatten)
     print(outputs[1:-1])
-
 
 if __name__ == "__main__":
     main()
