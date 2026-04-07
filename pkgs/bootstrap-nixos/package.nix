@@ -7,6 +7,7 @@
   git,
   nix,
   sops,
+  netcat,
   ...
 }:
 pkgs.writeShellApplication {
@@ -17,7 +18,7 @@ pkgs.writeShellApplication {
     git
     nix
     sops
-
+    netcat
   ];
 
   runtimeEnv = {
