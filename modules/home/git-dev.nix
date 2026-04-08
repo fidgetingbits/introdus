@@ -173,10 +173,6 @@ in
   config = lib.mkIf cfg.enable {
     programs.git = {
 
-      aliases = {
-        wa = "! ${lib.getExe pkgs.introdus.git-worktree-add}";
-      };
-
       settings = {
         user = {
           name = cfg.handle; # Default name for all git operations
@@ -199,6 +195,10 @@ in
           format = "ssh";
           # See later zsh alias for how we handle yubikey ssh signing with git
           ssh.allowedSignersFile = "${home}/.ssh/allowed_signers";
+        };
+
+        alias = {
+          wa = "! ${lib.getExe pkgs.introdus.git-worktree-add}";
         };
       };
       includes =
