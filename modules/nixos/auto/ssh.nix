@@ -2,10 +2,12 @@
   lib,
   pkgs,
   config,
+  secrets,
   ...
 }:
 lib.mkIf config.introdus.autoModules {
   programs.ssh = {
+    # NOTE: You can find these files in /etc/ssh/ssh_config under the GlobalKnownHostsFile line
     knownHostsFiles = [
       (pkgs.writeText "custom_known_hosts" ''
         ###
@@ -40,6 +42,12 @@ lib.mkIf config.introdus.autoModules {
         git.sr.ht ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBCj6y+cJlqK3BHZRLZuM+KP2zGPrh4H66DacfliU1E2DHAd1GGwF4g1jwu3L8gOZUTIvUptqWTkmglpYhFp4Iy4=
         git.sr.ht ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMZvRd4EtM7R+IHVMWmDkVU3VLQTSwQDSAvW0t2Tkj60
       '')
-    ];
+    ]
+    ++ lib.optional (!config.hostSpec.isMinimal) (
+      pkgs.writeText "custom_private_known_hosts" secrets.networking.ssh.knownHostsFileContents
+    )
+    ++ lib.optional (config.hostSpec.isWork) (
+      pkgs.writeText "custom_work_known_hosts" secrets.work.ssh.knownHostsFileContents
+    );
   };
 }
