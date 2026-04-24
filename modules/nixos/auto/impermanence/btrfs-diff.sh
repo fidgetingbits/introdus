@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # This script checks for new files on the current root system, or the difference between two root filesystems.
 # It assumes that the root filesystem is being wiped every boot, and that there are snapshots of previously wiped
-# filesystems (see btrfs-wipe-root.sh).
+# filesystems.
 
 set -eo pipefail
 
