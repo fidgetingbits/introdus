@@ -1,0 +1,16 @@
+{
+    "shebang": {
+        "body": "#!/usr/bin/env python",
+        "prefix": "sb"
+    },
+    "dictionary string": {
+        "prefix": "dstr",
+        "body": ["\"$1\": \"$2\","],
+        "description": "Empty dictionary string"
+    },
+    "formatted dictionary string": {
+        "prefix": "fdstr",
+        "body": ["\"$1\": f\"$2\","],
+        "description": "Empty formatted dictionary string"
+    }
+}

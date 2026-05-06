@@ -1,0 +1,55 @@
+{
+    "name": "fidgeting-snippets",
+    "engines": {
+        "vscode": "^1.11.0"
+    },
+    "contributes": {
+        "snippets": [
+            {
+                "language": [
+                    "plaintext",
+                    "markdown",
+                    "tex",
+                    "html",
+                    "global",
+                    "all"
+                ],
+                "path": "./global.json"
+            },
+            {
+                "language": [
+                    "nix"
+                ],
+                "path": "./nix.json"
+            },
+            {
+                "language": [
+                    "just"
+                ],
+                "path": "./just.json"
+            },
+            {
+                "language": [
+                    "lua"
+                ],
+                "path": "./lua.json"
+            },
+            {
+                "language": [
+                    "markdown"
+                ],
+                "path": "./markdown.json"
+            },
+            {
+                "language": [
+                    "shellscript",
+                    "shell",
+                    "sh",
+                    "zsh",
+                    "bash"
+                ],
+                "path": "./sh.json"
+            }
+        ]
+    }
+}

@@ -27,15 +27,50 @@ string.relpath = function(str, sub, n)
   return #result == 1 and result[1] or table.concat(result, '.')
 end
 
+local path = debug.getinfo(1, 'S').source:gsub('^@', '')
+local dir = vim.fn.fnamemodify(path, ':h:h:h')
+vim.opt.rtp:prepend(dir .. '/snippets/')
+vim.opt.rtp:prepend(dir .. '/snippets/vscode')
+vim.opt.packpath:prepend(dir)
+local introdus_after = dir .. '/after'
+if vim.fn.isdirectory(introdus_after) == 1 then
+  vim.opt.rtp:append(introdus_after)
+end
+
 vim.loader.enable() -- byte code caching
 
 require(MP:relpath('nixinfo')) -- setup nixInfo and lze
 
 -- NOTE: neovim flakes that extend from introdus will include more plugins.
---  Also see auto-loaded files in ./../plugin/ for options, keybinds, etc.
+--  Also see auto-loaded files in ./../plugin/ for options, keymaps, etc.
 nixInfo.lze.load({
+  {
+    import = MP:relpath('completion'),
+    category = 'completion',
+  },
+  {
+    import = MP:relpath('editing'),
+    category = 'editing',
+  },
   {
     import = MP:relpath('format'),
     category = 'format',
+  },
+  {
+    import = MP:relpath('lsp'),
+    category = 'lsp',
+    enabled = nixInfo(false, 'settings', 'devMode'),
+  },
+  {
+    import = MP:relpath('markdown'),
+    category = 'markdown',
+  },
+  {
+    import = MP:relpath('search'),
+    category = 'search',
+  },
+  {
+    import = MP:relpath('ui'),
+    category = 'ui',
   },
 })

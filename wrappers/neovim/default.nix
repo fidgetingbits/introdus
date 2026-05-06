@@ -14,6 +14,7 @@ let
       ./lua
       ./after
       ./plugin
+      ./snippets
     ];
   };
 in
@@ -28,7 +29,9 @@ in
         description = ''
           Enables additional development plugins.
 
-          Also implicitly uses unwrappedConfig unless
+          Setting this flag also implicitly will use an impure and hot reloadable
+          config via `unwrappedConfig`. If you don't want that, set `hotReload`
+          to `false`.
         '';
       };
 
@@ -51,8 +54,9 @@ in
         description = ''
           When enabled, neovim will use a mutable impure config path.
 
-          This allows hot reloading of some settings. Defaults to `devMode`, but
-          can be forced off.
+          This allows hot reloading of some settings. Defaults to the value of
+          `devMode`, but the exists so it can be forced off independently of
+          `devMode`.
 
           When disabled, an immutable pure config in the `/nix/store` will be used.
         '';
@@ -76,19 +80,16 @@ in
           This value is used when hotReload is true.'';
       };
 
-      extraConfig = lib.mkOption {
+      baseConfig = lib.mkOption {
         type = lib.types.nullOr lib.types.path;
         default = null;
         description = ''
           Specify a base neovim config to load from a wrapper extending the
           introdus neovim module.
 
-          This allows the introdus neovim config to be loaded at runtime.
-
-          When a neovim flake extends from the introdus wrapper, we still want to
-          load the introdus lua files as a config, so pass it as an environment variable
-          NVIM_BASE_CONFIG to the executed nvim process, so it can be be add to the runtime
-          in the other flake
+          This allows the introdus neovim config to be loaded at runtime. This
+          can point to an impure path to allow hot reloading of introdus
+          config, in addition to personal config.
         '';
       };
 
@@ -101,6 +102,13 @@ in
           while already nested inside a neovim terminal. The expression will be
           passed through lib.escapeShellArg.
         '';
+      };
+
+      defaultTerminalOpenStyle = lib.mkOption {
+        type = lib.types.str;
+        default = "split";
+        example = "vsplit";
+        description = "What orientation to open a file in when running vi in a nested terminal";
       };
 
       neovide = lib.mkOption {
@@ -195,7 +203,6 @@ in
     runShell = [
       # bash
       ''
-
         # If we are nested in nvim already, and didn't provide arguments, run
         # some sane default.
         # If neovide is trying to run us, don't bother using rpc
@@ -209,17 +216,23 @@ in
 
         # This won't be set by neovide, but some terminal stuff expects it (checkhealth, etc)
         export TERM=xterm-256color
+        # If the wrapper has a baseConfig path set, expose it to neovim config
         ${
-          if config.settings.extraConfig != null then
-            "export NVIM_BASE_CONFIG=${config.settings.extraConfig}"
+          if config.settings.baseConfig != null then
+            # bash
+            ''
+              export NVIM_BASE_CONFIG=${config.settings.baseConfig}
+            ''
           else
             ""
+
         }
       ''
     ];
 
     # NOTE: Specs are enabled by default
     specs = {
+
       core = {
         data = lib.attrValues {
           inherit (pkgs.vimPlugins)
@@ -252,6 +265,18 @@ in
             ;
         };
 
+        mainInfo.nixdExtras = {
+          nixpkgs = "import ${lib.cleanSource pkgs.path} {}";
+          get_configs =
+            lib.generators.mkLuaInline
+              # lua
+              ''
+                function(type, path)
+                    return [[import ${./nixd.nix} "${pkgs.stdenv.hostPlatform.system}" "]] .. type .. [[" ]] .. (path or "./.")
+                end
+              '';
+        };
+
         extraPackages = lib.attrValues {
           inherit (pkgs)
             bash-language-server
@@ -260,6 +285,7 @@ in
             marksman # markdown
             nixd
             nix-doc
+            pyright
             ruff # python
             taplo # toml
             typos-lsp
@@ -302,23 +328,39 @@ in
           lib.attrValues {
             inherit (pkgs.vimPlugins)
               # catppuccin-nvim
-              fidget-nvim
               hardtime-nvim
               lualine-nvim
               neo-tree-nvim
               noice-nvim
               nvim-notify
               smart-splits-nvim
-              snacks-nvim
               tabby-nvim
               todo-comments-nvim
               trouble-nvim
               which-key-nvim
               ;
             inherit (config.nvim-lib.neovimPlugins)
+
               zen-mode # Using fork to fix a terminal mode error
               ;
           }
+          ++ [
+            (pkgs.vimPlugins.snacks-nvim.overrideAttrs (oldAttrs: {
+              patches = (oldAttrs.patches or [ ]) ++ [
+                # Prevent a crash related to github
+                (pkgs.fetchpatch {
+                  url = "https://github.com/fidgetingbits/snacks.nvim/commit/72b8677b18304eedf047f3c8c34ede09e3ae15ad.patch";
+                  hash = "sha256-csqREyWXSjc7LRImSz/ETffZhaA7518zEFhllBKWbIA=";
+                })
+
+                # Prevent checkhealth from spamming errors for snacks features that aren't installed
+                (pkgs.fetchpatch {
+                  url = "https://github.com/fidgetingbits/snacks.nvim/commit/c65c76427d62640d30263d2cc3f3817d4d8747d3.patch";
+                  hash = "sha256-lE6Pv2KRSm3s0gaILwGXrGftfw7ZzCL5jS6EZRGGZcw=";
+                })
+              ];
+            }))
+          ]
           ++ lib.optionals config.settings.neovide (
             lib.attrValues {
               inherit (config.nvim-lib.neovimPlugins)
@@ -397,6 +439,7 @@ in
           inherit (pkgs.vimPlugins)
             vim-markdown-toc
             markdown-preview-nvim
+            render-markdown-nvim
             obsidian-nvim
             ;
         };
@@ -448,6 +491,7 @@ in
                 javascript
                 jinja
                 jq
+                just
                 kconfig
                 kdl
                 lua
@@ -471,14 +515,13 @@ in
                 mini-surround
                 resession-nvim
                 vim-easy-align
-                nvim-treesitter
-                nvim-treesitter-textobjects
                 nvim-treesitter-context
                 ;
               inherit (config.nvim-lib.neovimPlugins)
                 nvim-toggler
                 nvim-better-n
                 pick-resession
+                treesitter-textobjects # New enough to not use old nvim-treesitter
                 ;
             }
             ++ [
@@ -527,8 +570,17 @@ in
           default = [ ];
           description = "An extraPackages spec field to put packages to suffix to the PATH";
         };
+
+        options.mainInfo = lib.mkOption {
+          type = wlib.types.attrsRecursive;
+          default = { };
+          description = "an optional mainInfo spec field to add to the main info plugin instead of the spec specific one";
+        };
       };
     extraPackages = config.specCollect (acc: v: acc ++ (v.extraPackages or [ ])) [ ];
 
+    info = lib.mkMerge (
+      config.specCollect (acc: v: acc ++ lib.optional (v.mainInfo or { } != { }) v.mainInfo) [ ]
+    );
   };
 }

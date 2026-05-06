@@ -1,1 +1,3 @@
+local MP = ...
+
 require('introdus')

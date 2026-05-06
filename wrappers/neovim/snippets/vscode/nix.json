@@ -1,0 +1,7 @@
+{
+    "bashstr": {
+        "prefix": "bstr",
+        "body": ["$1 = #bash\n''\n$0\n'';\n"],
+        "description": "Nix bash-formatted raw string"
+    }
+}

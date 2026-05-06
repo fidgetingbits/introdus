@@ -1,0 +1,10 @@
+{
+    "default": {
+        "prefix": "default",
+        "body": ["[private]", "@default:", "  just --list", ""]
+    },
+    "shebang": {
+        "body": "#!/usr/bin/env bash",
+        "prefix": "sb"
+    }
+}

@@ -15,8 +15,9 @@ return {
           python = { 'ruff' },
           nix = { 'nixfmt' },
           rust = { 'rustfmt' },
-          sh = { 'shfmt', 'shellharden' },
-          zsh = { 'shfmt', 'shellharden' },
+          -- IMPORTANT: shellharden is busted on a lot of scripts, so don't add here
+          sh = { 'shfmt' },
+          zsh = { 'shfmt' },
           json = { 'fixjson', 'prettier' },
           yaml = { 'yamlfmt', 'prettier' },
           toml = { 'taplo' },
@@ -24,9 +25,9 @@ return {
           -- javascript = { { "prettierd", "prettier" } },
         },
         formatters = {
-          kdl = {
+          kdlfmt = {
             command = 'kdlfmt',
-            args = { 'format', '--kdl-version=v1', '-' },
+            args = { 'format', '--kdl-version', 'v1', '--stdin' },
             stdin = true,
           },
         },
@@ -82,7 +83,7 @@ return {
         desc = 'Toggle autoformat-on-save',
       })
 
-      vim.keymap.set({ 'n', 'v' }, '<leader>FF', function()
+      vim.keymap.set({ 'n', 'x' }, '<leader>FF', function()
         conform.format({
           lsp_fallback = true,
           async = false,
@@ -91,18 +92,18 @@ return {
       end, { desc = '[F]ormat [F]ile' })
 
       vim.keymap.set(
-        { 'n', 'v' },
-        '<leader>Fb',
+        { 'n', 'x' },
+        '<leader>tFb',
         '<cmd>FormatToggle buffer<CR>',
-        { desc = '[Format] toggle buffer' }
+        { desc = '[T]oggle [F]ormatting for buffer' }
       )
       vim.keymap.set(
-        { 'n', 'v' },
-        '<leader>Fg',
+        { 'n', 'x' },
+        '<leader>tFg',
         '<cmd>FormatToggle global<CR>',
-        { desc = '[Format] toggle global' }
+        { desc = '[T]oggle [F]ormatting globally' }
       )
-      vim.keymap.set({ 'n', 'v' }, '<leader>Ft', vim.cmd.FormatToggle, { desc = '[Format] toggle' })
+      vim.keymap.set({ 'n', 'x' }, '<leader>Ft', vim.cmd.FormatToggle, { desc = '[Format] toggle' })
     end,
   },
 }

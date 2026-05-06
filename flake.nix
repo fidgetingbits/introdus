@@ -33,16 +33,16 @@
           default = self.homeManagerModules.introdus;
           introdus = ./modules/home;
         };
+
+        # Expose base neovim wrapper to be further extended by personal configs
+        wrappers = {
+          neovim = nixpkgs.lib.modules.importApply ./wrappers/neovim inputs;
+        };
       };
       systems = [
         "x86_64-linux"
       ];
       imports = [ wrappers.flakeModules.wrappers ];
-
-      # Expose base neovim wrapper to be further extended by personal configs
-      flake.wrappers = {
-        neovim = nixpkgs.lib.modules.importApply ./wrappers/neovim inputs;
-      };
 
       perSystem =
         { system, ... }:
@@ -53,9 +53,14 @@
             inherit system;
             overlays = [
               self.overlays.default
-              # Inject stable nixos pkgs for use by some packages (eg: unwanted-builtins)
+              # NOTE: Inject stable nixos pkgs for use by some packages (eg: unwanted-builtins)
+              # and unstable for standalone introdus use such as automated checks
               (final: prev: {
                 stable = import inputs.nixpkgs-stable {
+                  system = final.stdenv.hostPlatform.system;
+                  config.allowUnfree = true;
+                };
+                unstable = import inputs.nixpkgs-unstable {
                   system = final.stdenv.hostPlatform.system;
                   config.allowUnfree = true;
                 };
@@ -131,7 +136,7 @@
     };
 
     ##
-    # Neovim plugins not tracked by nixpkgs
+    # Neovim plugins not tracked by nixpkgs or that require newer versions
     ##
     plugins-nvim-toggler = {
       url = "github:nguyenvukhang/nvim-toggler";
@@ -145,17 +150,18 @@
       url = "github:benfowler/telescope-luasnip.nvim";
       flake = false;
     };
-
     plugins-confirm-quit = {
       url = "github:yutkat/confirm-quit.nvim";
       flake = false;
     };
-
+    plugins-treesitter-textobjects = {
+      url = "github:nvim-treesitter/nvim-treesitter-textobjects";
+      flake = false;
+    };
     plugins-pick-resession = {
       url = "github:scottmckendry/pick-resession.nvim";
       flake = false;
     };
-
     plugins-zen-mode = {
       url = "github:fidgetingbits/zen-mode.nvim?ref=fix-terminal";
       flake = false;

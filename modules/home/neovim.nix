@@ -52,7 +52,21 @@ in
           |> lib.concatStringsSep ",";
         compile_generated_lua = false; # Temporary for debugging
       };
+    };
 
+    xdg.desktopEntries.nvim-neovide = {
+      name = "Neovide (Nvim Wrapper)";
+      genericName = "Text Editor";
+      exec = "nvim-neovide %F";
+      icon = "nvim";
+      terminal = false;
+      categories = [
+        "Utility"
+        "TextEditor"
+      ];
+      settings = {
+        StartupWMClass = "neovide";
+      };
     };
 
     programs.zsh = {
@@ -63,12 +77,31 @@ in
         lib.optionalString osConfig.hostSpec.useNeovimTerminal
           # bash
           ''
+            # Add an option for forcing files into a new tabpage
+            # FIXME: Would be good to send a PR to add -T or similar
+            nv_wrapper() {
+                extra_args=()
+                args=("$@")
+                for ((i=0; i<"''${#args[@]}"; ++i)); do
+                    case "''${args[i]}" in
+                        -T)
+                            unset "args[$i]"
+                            extra_args=(-e 'wincmd T')
+                            break
+                            ;;
+                    esac
+                done
+                nv "''${extra_args[@]}" "''${args[@]}"
+            }
+            alias nv=nv_wrapper
+
             if [[ $NVIM ]]; then
                 # FIXME: This should use wrapper
                 export MANPAGER='${nvr} --remote-tab +Man! -'
                 # FIXME: replace with nvim once --remote-wait is supported:
                 # https://github.com/neovim/neovim/issues/24788
                 export GIT_EDITOR="${nvr} --remote-wait-silent -cc split"
+                export SOPS_EDITOR="${nvr} --remote-wait-silent -cc split"
 
                 # Specifically update local-window scoped working directory
                 # only, as otherwise breaks tab workspaces
@@ -78,13 +111,20 @@ in
                 }
                 chpwd_functions+=(autocd_nvim)
             fi
+
           '';
     };
 
-    home = {
-      packages = [
-        pkgs.neovim-remote
-      ];
-    };
+    home =
+      let
+        # Wrapper in the vein of nvr, but shorter commands and using the wrapper
+      in
+      {
+        packages = [
+          pkgs.neovim-remote
+        ]
+        # Tool to allow you to easily open files from terminal in splits, etc
+        ++ lib.optional osConfig.hostSpec.useNeovimTerminal pkgs.page;
+      };
   };
 }

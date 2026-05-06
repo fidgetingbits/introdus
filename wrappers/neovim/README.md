@@ -47,36 +47,28 @@ This is required because introdus baseline itself isn't some external plugin,
 but rather an additional configuration we want to preload in order to setup all
 of our functionality, which in turn lets us load plugins, etc.
 
-The introdus path can be set in nix using the `settings.extraConfig` option,
+The introdus path can be set in nix using the `settings.baseCofig` option,
 which should point to the introdus neovim wrapper path. For example:
 
 ```nix
-    settings.extraConfig = "${inputs.introdus}/wrappers/neovim";
+    settings.baseCofig = "${inputs.introdus}/wrappers/neovim";
 ```
 
 This path will be passed at runtime to nvim using the `NVIM_BASE_CONFIG`
 environment variable, which can be read by and loaded by lua. To load the
-introdus config at startup, the following lua code needs to be prefixed to the
+introdus config at startup, the following lua code needs to be added to the
 `init.lua` config file of the wrapper extending introdus:
 
 ```lua
+-- This config is derived from the introdus neovim wrapper
+-- so have introdus set things up for us
 local introdus_config = os.getenv('NVIM_BASE_CONFIG')
 if introdus_config then
-  -- Prepend so B's lua/ directory is searchable immediately
-  vim.opt.rtp:prepend(introdus_config)
-
-  -- Prepend to packpath so B's plugins (if any) are found
-  vim.opt.packpath:prepend(introdus_config)
-
-  -- Handle the 'after' directory correctly
-  local introdus_after = introdus_config .. '/after'
-  if vim.fn.isdirectory(introdus_after) == 1 then
-    vim.opt.rtp:append(introdus_after)
-  end
+  vim.opt.runtimepath:prepend(introdus_config)
   require('introdus')
 else
   print([[ERROR: This config cannot run without introdus.
-    Use settings.extraConfig in your wrapper to specify the introdus path.]])
+      Use settings.baseConfig in your wrapper to specify the introdus path]])
 end
 ```
 
@@ -103,10 +95,10 @@ disk. By default the `settings.devMode` boolean set to true will use
 `unwrappedConfig`, however it can be toggled on/off independent of `devMode` by
 using the `settings.hotReload` boolean.
 
-To configure these variables (for now) you can either set the values in your
+To configure these variables you can either set the values in your
 neovim flake's `module.nix` file or in your nix config. The
 `hostSpec.isDevelopment` flag from your nix config will determine the default
-value of `settings.devMode`.
+value of `settings.devMode`, which in turn will determine if hot reloading is enabled by default.
 
 If you want to set them in your nixos-config you can do something like this:
 
@@ -153,3 +145,74 @@ and expose
 The wrapper is exposed as a standalone package without needing to be further
 wrapped. Run `nix build .#neovim` to build it. You should be able to then run
 `result/bin/nvim`.
+
+## Development
+
+### Adding a new plugin
+
+When you add a new plugin there are a few steps:
+
+1) Modify `./module.nix` to install the plugin. If there is an existing package in nixpkgs, install it in the relevant category (defined in `specs` attrset) using the `pkgs.vimPlugins` set. If there is no package, import the git repo directly andthen access it using the `config.nvim-lib.neovimPlugins` set. In order to add the git repo you will need to add a new input to `../../flake.nix`.
+
+You add something like this:
+
+```nix
+    plugins-zen-mode = {
+      url = "github:fidgetingbits/zen-mode.nvim?ref=fix-terminal";
+      flake = false;
+    };
+```
+
+Then access it from `config.nvim-lib.neovimPlugins` with the `plugins-` part removed, like:
+
+```nix
+  specs = {
+    ...
+    ui = {
+      after = [ "core" ];
+      lazy = true;
+      data = lib.attrValues {
+          inherit (config.nvim-lib.neovimPlugins)
+            zen-mode # Using fork to fix a terminal mode error
+            ;
+      };
+    ...
+    };
+  ...
+  };
+```
+
+2) Import the actual module for the related category. Above in the example for `zen-mode` it is part of `ui`. So you would need to modify to include an entry to import a new `zen-mode.lua` file you will place in `lua/introdus/ui/` folder:
+
+```lua
+local MP = ...
+return {
+  ...
+  { import = MP:relpath('zen-mode') },
+  ...
+}
+```
+
+3) Finally inside `zen-mode.lua` you configure the plugin settings. It will look something like this:
+
+```lua
+return {
+  {
+    'zen-mode',
+    event = 'DeferredUIEnter',
+    after = function(plugin)
+      require('zen-mode').setup()
+      vim.keymap.set('n', '<leader>zz', vim.cmd.ZenMode, { desc = 'Toggle zen mode' })
+    end,
+  },
+}
+```
+
+There is one quirk here, which is the name to use to require the module, which is the first entry of the table. Above it is `zen-mode`, however if you look at the installation notes for the official project [here](https://github.com/folke/zen-mode.nvim) you will see they say to use `zen-mode.nvim`. The naming will sometimes differ from the official recommendation if you are using a dedicated flake input, etc.
+
+In order to be sure what the actual name is there is a simple way to debug. From your neovim wrapper dev shell, run `nix build .#full`. This will give you the `result/` folder that contains the installed neovim packages. Enter the folder and run something like `fd zen-mode`. This will tell the exact folder name, which is what you need to use in the first field:
+
+```bash
+❯ fd zen-mode
+nvim-packdir/pack/myNeovimPackages/opt/zen-mode
+```

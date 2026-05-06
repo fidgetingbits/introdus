@@ -1,0 +1,11 @@
+{
+    "shebang": {
+        "body": "#!/usr/bin/env bash",
+        "prefix": "sb"
+    },
+    "shellcheck disable": {
+        "prefix": "scd",
+        "body": ["# shellcheck disable=SC$0"],
+        "description": "Add shellcheck disable directive"
+    }
+}

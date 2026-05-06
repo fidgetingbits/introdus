@@ -14,23 +14,13 @@ rec {
     };
     stylua = {
       enable = true; # lua
-      settings = {
-        # From https://github.com/neovim/neovim/blob/master/.stylua.toml
-        # call_parantheses changed for consistency
-        column_width = 100;
-        line_endings = "Unix";
-        indent_type = "Spaces";
-        indent_width = 2;
-        quote_style = "AutoPreferSingle";
-        call_parentheses = "Always";
-      };
+      settings = lib.fromTOML (lib.readFile ../stylua.toml);
     };
     yamlfmt.enable = true; # yaml
   };
   settings.formatter = lib.optionalAttrs programs.kdlfmt.enable {
     kdlfmt = {
       options = [
-        "format"
         # This is needed for niri config files not to break various quoted things
         "--kdl-version"
         "v1"
