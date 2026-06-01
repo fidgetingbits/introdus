@@ -33,11 +33,60 @@ stdenvNoCC.mkDerivation (
         NH_NO_CHECKS = 1; # https://github.com/nix-community/nh/issues/353
         NIX_SSHOPTS = "-p10022"; # FIXME: This should be updated to use secrets now somehow
       };
-      text = # bash
+      text =
+        # bash
         ''
           # shellcheck disable=SC1091
           source "${introdus.introdus-helpers}/share/introdus-helpers/helpers.sh"
-          HOST="''${1-$(hostname)}"
+
+          function help_and_exit() {
+              echo "USAGE: $(basename "$0") [OPTIONS]"
+              echo " eg: $(basename "$0") --boot-only oedo"
+              echo
+              echo "OPTIONS:"
+              echo "  --no-switch  Use nixos-rebuild boot instead of switch."
+              echo "               Needed if you run into systemd protocol"
+              echo "               errors or similar during switch."
+              echo "  -h, --help   Show this help message and exit"
+              echo
+              exit 1
+          }
+
+          parse_args() {
+              local min_args=$1
+              shift
+
+              if [ $# -lt "$min_args" ]; then
+                  help_and_exit
+              fi
+
+              while [[ $# -gt 0 ]]; do
+                  case "$1" in
+                  --debug)
+                      if [ $# -lt $((min_args + 1)) ]; then
+                          help_and_exit
+                      fi
+                      set -x
+                      ;;
+                  -h | --help)
+                      help_and_exit
+                      ;;
+                  --no-switch)
+                      REBUILD_CMD="boot"
+                      ;;
+                  *)
+                      if [ "''${POSITIONAL_ARGS-}" = "" ]; then
+                          POSITIONAL_ARGS=()
+                      fi
+                      POSITIONAL_ARGS+=("$1")
+                      ;;
+                  esac
+                  shift
+                done
+            }
+
+          parse_args "0" "$@"
+          HOST="''${POSITIONAL_ARGS[0]-$(hostname)}"
 
           reference_lock=()
           if "$PER_HOST_LOCKS"; then
@@ -52,7 +101,7 @@ stdenvNoCC.mkDerivation (
               --impure \
               --show-trace \
               --flake .#"$HOST" \
-              switch
+              "''${REBUILD_CMD-switch}"
           else
             nh os switch . -- \
               "''${reference_lock[@]}" \
