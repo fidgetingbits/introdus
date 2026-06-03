@@ -47,7 +47,7 @@ lib.mkIf config.introdus.autoModules {
       pkgs.writeText "custom_private_known_hosts" secrets.networking.ssh.knownHostsFileContents
     )
     ++ lib.optional (config.hostSpec.isWork) (
-      pkgs.writeText "custom_work_known_hosts" secrets.work.ssh.knownHostsFileContents
+      pkgs.writeText "custom_work_known_hosts" secrets.work.ssh.knownHostsFileContents or ""
     );
   };
 }
