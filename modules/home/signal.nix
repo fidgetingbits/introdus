@@ -21,9 +21,13 @@ in
     home.packages = [
       # the override handles an issue that occurs when using signal in gnome as
       # well as other window managers
-      (cfg.package.override {
-        commandLineArgs = "--password-store='gnome-libsecret'";
-      })
+      (cfg.package.overrideAttrs (oldAttrs: {
+        postFixup = (oldAttrs.postFixup or "") + ''
+          wrapProgram $out/bin/signal-desktop \
+            --add-flags "--password-store=gnome-libsecret"
+        '';
+      }))
+
     ];
 
     xdg = lib.mkIf config.xdg.mimeApps.enable {
