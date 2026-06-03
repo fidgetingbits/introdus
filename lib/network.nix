@@ -13,6 +13,22 @@ rec {
     # nixfmt hack
     |> lib.concatStringsSep ".";
 
+  # Isolate the first three octets an IP. eg 192.168.0.1 -> 192.168.1
+  triplet =
+    ip:
+    ip
+    |> lib.splitString "."
+    |> lib.take 3
+    # nixfmt hack
+    |> lib.concatStringsSep ".";
+
+  lastOctet =
+    ip:
+    ip
+    |> lib.splitString "."
+    # nixfmt hack
+    |> lib.last;
+
   makeSubnet = ip: prefixLength: {
     wildcard = replaceLastOctet ip "*";
     prefixLength = prefixLength;
@@ -20,11 +36,7 @@ rec {
     cidr = "${ip}/${toString prefixLength}";
     gateway = replaceLastOctet ip "1";
     # The first three octets of the IP address
-    triplet =
-      lib.splitString "." ip
-      |> lib.take 3
-      # nixfmt hack
-      |> lib.concatStringsSep ".";
+    triplet = triplet ip;
   };
 
   makeHost = opts: {
@@ -36,6 +48,7 @@ rec {
       mac = (if opts ? "mac" && lib.isList opts.mac then opts.mac else [ opts.mac or "" ]);
       user = opts.user or "";
       sshPort = opts.sshPort or ports.tcp.ssh;
+      wgpk = opts.wgpk or "";
     };
   };
 
