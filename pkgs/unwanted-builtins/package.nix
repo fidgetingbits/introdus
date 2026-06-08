@@ -9,7 +9,7 @@
 # nix eval --inputs-from . nixpkgs#lib.div
 # ```
 # This means if this tool was built with unstable, it would fail on the use of
-# builtins.div, even though lib.div is not valid on 25.11
+# builtins div, even though lib.div is not valid on 25.11
 {
   lib,
   pkgs,

@@ -49,7 +49,7 @@ in
 
     transitionAngles = lib.mkOption {
       type = lib.types.listOf lib.types.int;
-      default = lib.genList (x: x * 15) (builtins.div 360 15);
+      default = lib.genList (x: x * 15) (lib.div 360 15);
       description = "Angle of transition for specific animations";
     };
 
@@ -61,9 +61,9 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    services.swww.enable = true;
+    services.awww.enable = true;
     # Delay starting so WAYLAND_DISPLAY is setup via uwsm
-    systemd.user.services.swww = {
+    systemd.user.services.awww = {
       Unit = {
         PartOf = [
           config.wayland.systemd.target
@@ -82,21 +82,21 @@ in
     systemd.user.services.awww-cycle = lib.mkIf (cfg.wallpaperDir != "") {
       Unit = {
         Description = "Cycle wallpaper images using awww";
-        PartOf = [ "swww.service" ];
+        PartOf = [ "awww.service" ];
         After = [ config.wayland.systemd.target ];
       };
       Install = {
-        WantedBy = [ "swww.service" ];
+        WantedBy = [ "awww.service" ];
       };
 
       Service =
         let
           awww-cycle = pkgs.writeShellApplication {
             name = "awww-cycle";
-            runtimeInputs = lib.attrValues { inherit (pkgs) coreutils swww systemdMinimal; };
+            runtimeInputs = lib.attrValues { inherit (pkgs) coreutils awww systemdMinimal; };
             text = ''
               function skip() {
-                swww query | while read -r line; do
+                awww query | while read -r line; do
                   if [[ -z "$line" ]]; then
                       continue
                   fi
@@ -115,9 +115,9 @@ in
                     sleep 1;
                 done
 
-                # while ! swww query 2>/dev/null; do
-                while ! swww query ; do
-                  # Handle: 'Error: "Socket file not found. Are you sure swww-daemon is running?"'
+                # while ! awww query 2>/dev/null; do
+                while ! awww query ; do
+                  # Handle: 'Error: "Socket file not found. Are you sure awww-daemon is running?"'
                   sleep 1;
                 done
                 echo "awww daemon is accessible"
@@ -130,7 +130,7 @@ in
                   mapfile -t images < <(find ${cfg.wallpaperDir}/ -maxdepth 1)
 
                   # shellcheck disable=SC2068
-                  if ! swww img $@ \
+                  if ! awww img $@ \
                     "''${images[RANDOM%''${#images[@]}]}" \
                     --transition-type "''${types[RANDOM%''${#types[@]}]}" \
                     --transition-fps ${toString cfg.transitionFPS} \
@@ -148,7 +148,7 @@ in
                 ${
                   if cfg.cyclePerMonitor then
                     ''
-                      readarray -t monitors < <(swww query | cut -d ":" -f 2)
+                      readarray -t monitors < <(awww query | cut -d ":" -f 2)
                       for m in "''${monitors[@]}"; do
                         cycle_image -o "$m"
                       done

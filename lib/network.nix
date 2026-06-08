@@ -61,7 +61,7 @@ rec {
         assert (
           lib.assertMsg (last < 255) "Last octet of ${ip} cannot be incremented because it is already 255)"
         );
-        builtins.toString (last + 1);
+        lib.toString (last + 1);
       final = lib.concatStringsSep "." (start ++ [ newLast ]);
     in
     final;

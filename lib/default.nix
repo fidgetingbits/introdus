@@ -12,6 +12,8 @@ rec {
 
   # use path relative to the root of the project
   relativeToRoot = lib.path.append ../.;
+  # Common value higher priority than lib.mkDefault (1000), but lower than lib.mkForce (10)
+  highPrio = lib.mkOverride 500;
 
   # Imports any .nix file in the specific directory, and any folder that
   # contains a default.nix. Note this means that a folder containing
@@ -20,7 +22,7 @@ rec {
   scanPaths =
     path:
     lib.map (f: (path + "/${f}")) (
-      builtins.readDir path
+      lib.readDir path
       |> lib.attrsets.filterAttrs (
         file: _type:
         (_type == "directory" && lib.pathExists (path + "/${file}/default.nix"))
@@ -33,7 +35,7 @@ rec {
   scanPathsFilterPlatform =
     path:
     lib.filter (
-      path: lib.match "nixos.nix|darwin.nix|nixos|darwin" (leaf (builtins.toString path)) == null
+      path: lib.match "nixos.nix|darwin.nix|nixos|darwin" (leaf (lib.toString path)) == null
     ) (scanPaths path);
 
 }
