@@ -200,6 +200,7 @@ in
         urls = [ { template = "https://nixpkgs-tracker.ocfox.me/?pr={searchTerms}"; } ];
 
         definedAliases = [
+          "@nt"
           "@nixpkgstracker"
           "@nixtrack"
           "@nixprtracker"
