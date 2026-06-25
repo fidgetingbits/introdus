@@ -2,6 +2,65 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.2.0 - 2026-06-25
+#### Features
+- (**firefox**) add base config with search and extensions options - (f2df36e) - emergentmind
+- (**firefox**) auto-add search engine shortcuts - (6e7fbc9) - fidgetingbits
+- (**git**) add new zsh aliases, settings, and worktree helper - (742eddd) - fidgetingbits
+- (**impermanence**) move from my nix-config - (2caafdd) - fidgetingbits
+- (**json2nix**) support piping input - (244dee5) - fidgetingbits
+- (**lib**) add new network and neovim functions - (2dd2874) - fidgetingbits
+- (**neovim**) add shared, baseline neovim config - (99c72a0) - emergentmind
+- (**rebuild-host**) support boot instead of switch only - (77eb0d7) - fidgetingbits
+- (**ssh**) add private and work known hosts from secrets - (12cfcbb) - emergentmind
+- (**treefmt**) add kdlfmt - (3119c7a) - fidgetingbits
+- (**worktree-add**) support base branch argument - (4cfc772) - fidgetingbits
+- (**zoxide**) add defaults and key binding - (af02e64) - fidgetingbits
+- 26.05 changes - (82f4085) - emergentmind
+- add impermanence - (c17d44c) - emergentmind
+- mail-delivery via msmtp or postfix-relay - (534d6ce) - emergentmind
+- plymouth boot graphics - (b145f68) - emergentmind
+- add baseline pipewire audio module - (e287766) - emergentmind
+- add baseline niri managed by uwsm - (559ad26) - emergentmind
+- yubikey-touch-detector - (6fbbdcc) - emergentmind
+- add silent-sddm service - (51293c4) - fidgetingbits
+- noctalia-timer - (e0398c0) - emergentmind
+- add git-color-cc for conventional commit ricing - (72941f9) - fidgetingbits
+- squashed - add neovim wrapper that can be extended by external flakes - (6b987a0) - emergentmind
+- add xdg module - (f3a1427) - fidgetingbits
+- signal desktop with password-store arg and xdg mimeApp entries - (66a66b1) - emergentmind
+#### Bug Fixes
+- (**awww**) awww-cycle wasn't working reliabily with uwsm - (a9c650b) - fidgetingbits
+- (**firefox**) address warning and add an alias - (eeeb3ea) - emergentmind
+- (**git**) properly set email for git@<force> style remotes - (b41205a) - fidgetingbits
+- (**signal**) commandLineArgs is deprecated so switch to wrapper - (fdc819a) - fidgetingbits
+- (**ssh**) allow an empty secret known host file - (4b4ac7c) - fidgetingbits
+- (**unwanted-builtins**) needs nixpkgs 25.11 for consistency - (2b0d7b3) - fidgetingbits
+- (**unwanted-builtins**) missing currentTime and currentSystem - (ec57348) - fidgetingbits
+- lock file was busted - (b90c80a) - fidgetingbits
+- add missing stable overlay - (b6adf2f) - fidgetingbits
+- incorrectly setting worktree BASE_BRANCH based on alpha order - (1f34f0c) - fidgetingbits
+#### Documentation
+- (**impermanence**) forgot to remove reference to file no longer in use. - (800b2a4) - emergentmind
+- fix comment path for treefmt config - (ad4d3a3) - fidgetingbits
+#### Refactoring
+- (**editorconfig**) switch to 2 spaces for nix and lua - (03fb57c) - emergentmind
+- (**editorconfig**) switch to 2 spaces for nix and lua - (27c31b6) - fidgetingbits
+- nvim-firefox-tweaks - (fd1f1e5) - emergentmind
+- remove old hyprland tools - (98a8948) - fidgetingbits
+- more comment cleaning - (29a958f) - fidgetingbits
+- remove unneeded inputs - (ef04613) - fidgetingbits
+- merge PR-related workflows - (3564230) - fidgetingbits
+#### Miscellaneous Chores
+- git.aliases was renamed to git.settings.alias - (b63a966) - emergentmind
+- bump lock - (258315f) - fidgetingbits
+- lint - (9fb0d5e) - fidgetingbits
+#### Style
+- remove redundant trap values - (240fd1c) - fidgetingbits
+- add ruff formatting for python scripts - (dee25ac) - fidgetingbits
+
+- - -
+
 ## 0.1.0 - 2026-01-07
 #### Features
 - Introdus v0.0.1 - (ec18989) - fidgetingbits
