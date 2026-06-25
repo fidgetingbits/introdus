@@ -44,7 +44,7 @@ in
         programs.firefox = {
           enable = true;
           # NOTE: configPath Set because stateVersion < 26.05
-          # configPath = "${config.xdg.configHome}/mozilla/firefox";
+          configPath = "${config.xdg.configHome}/mozilla/firefox";
           # Refer to https://mozilla.github.io/policy-templates or `about:policies#documentation` in firefox
           policies = {
             AppAutoUpdate = false; # Disable automatic application update

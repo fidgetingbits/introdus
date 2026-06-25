@@ -166,5 +166,9 @@
       url = "github:fidgetingbits/zen-mode.nvim?ref=fix-terminal";
       flake = false;
     };
+    plugins-resession = {
+      url = "github:fidgetingbits/resession.nvim?ref=visual-mode-fix";
+      flake = false;
+    };
   };
 }

@@ -350,6 +350,11 @@ in
 
         definedAliases = [ "@libgen" ];
       };
+      "wikipedia".metaData.hidden = true;
+      "google".metaData.hidden = true;
+      "amazondotcom-us".metaData.hidden = true;
+      "bing".metaData.hidden = true;
+      "ebay".metaData.hidden = true;
     }
     // gitHubLangSearches;
 }

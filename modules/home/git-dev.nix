@@ -266,6 +266,7 @@ in
       shellAliases = {
         # git commit
         gcm = "git commit -m";
+        gcem = "git commit -e -m";
         gcmcf = "git commit -m 'chore: update flake.lock'";
         gca = "git commit --amend";
         gcan = "git commit --amend --no-edit";

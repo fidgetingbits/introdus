@@ -12,7 +12,7 @@
     darkreader
     noscript
     proton-pass
-    proton-vpn
+    # proton-vpn
     redirector
     ublock-origin
   ];

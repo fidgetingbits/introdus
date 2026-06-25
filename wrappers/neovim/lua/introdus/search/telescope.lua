@@ -148,6 +148,7 @@ return {
       { t .. "h", function() return require('telescope.builtin').help_tags() end,   mode = { "n" }, desc = '[F]ind [H]elp', },
       { t .. "H", function() return require('telescope.builtin').highlights() end,   mode = { "n" }, desc = '[F]ind [H]ighlights / color map', },
       { t .. "k", function() return require('telescope.builtin').keymaps() end,     mode = { "n" }, desc = '[F]ind [K]eymaps', },
+      { "<c-/>",  function() return require('telescope.builtin').keymaps() end,     mode = { "n" }, desc = 'Find Keymaps', },
       { t .. "l", function() return require('telescope.builtin').builtin({include_extensions = true}) end, mode = { "n" }, desc = "[F]ind telescope commands", },
       { t .. "n", '<cmd>Telescope notify<CR>',                                      mode = { "n" }, desc = '[F]ind [N]otifications', },
       { t .. "P", function() return require('telescope.builtin').git_files() end,   mode = { "n" }, desc = '[F]ind [P]roject Root Files', },

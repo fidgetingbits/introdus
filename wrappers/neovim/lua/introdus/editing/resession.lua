@@ -1,5 +1,5 @@
 return {
-  'resession.nvim',
+  'resession',
   lazy = false,
   after = function()
     local resession = require('resession')

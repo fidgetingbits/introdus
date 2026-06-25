@@ -513,13 +513,13 @@ in
                 indent-blankline-nvim
                 mini-ai
                 mini-surround
-                resession-nvim
                 vim-easy-align
                 nvim-treesitter-context
                 ;
               inherit (config.nvim-lib.neovimPlugins)
                 nvim-toggler
                 nvim-better-n
+                resession
                 pick-resession
                 treesitter-textobjects # New enough to not use old nvim-treesitter
                 ;

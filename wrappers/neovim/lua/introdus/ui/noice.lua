@@ -57,6 +57,7 @@ return {
       })
       -- stylua: ignore start
       vim.keymap.set('n', '<leader>Nh', function() n.cmd('history') end, { desc = 'Noice History' })
+      vim.keymap.set('n', '<leader>Nl', function() n.cmd('last') end, { desc = 'Noice Last' })
       -- stylua: ignore end
     end,
   },
