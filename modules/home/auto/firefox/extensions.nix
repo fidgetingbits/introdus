@@ -12,7 +12,8 @@
     darkreader
     noscript
     proton-pass
-    # proton-vpn
+    #FIXME: this isn't working for some reason
+    #proton-vpn
     redirector
     ublock-origin
   ];

@@ -31,7 +31,8 @@ stdenvNoCC.mkDerivation (
         NIXPKGS_ALLOW_UNFREE = 1;
         NIXPKGS_ALLOW_BROKEN = 1;
         NH_NO_CHECKS = 1; # https://github.com/nix-community/nh/issues/353
-        NIX_SSHOPTS = "-p10022"; # FIXME: This should be updated to use secrets now somehow
+        # NIX_SSHOPTS = "-p10022"; # FIXME: This should be updated to use secrets now somehow
+        NIX_SSHOPTS = "-p22"; # FIXME: This should be updated to use secrets now somehow
       };
       text =
         # bash

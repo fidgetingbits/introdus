@@ -2,32 +2,31 @@
 set -eo pipefail
 
 ### UX helpers
-
 function red() {
-    echo -e "\x1B[31m[!] $1 \x1B[0m"
+    printf "\033[31m[!] %s \033[0m\n" "$1"
     if [ -n "${2-}" ]; then
-        echo -e "\x1B[31m[!] $($2) \x1B[0m"
+        printf "\033[31m[!] %s \033[0m\n" "$($2)"
     fi
 }
 
 function green() {
-    echo -e "\x1B[32m[+] $1 \x1B[0m"
+    printf "\033[32m[+] %s \033[0m\n" "$1"
     if [ -n "${2-}" ]; then
-        echo -e "\x1B[32m[+] $($2) \x1B[0m"
+        printf "\033[32m[+] %s \033[0m\n" "$($2)"
     fi
 }
 
 function blue() {
-    echo -e "\x1B[34m[*] $1 \x1B[0m"
+    printf "\033[34m[*] %s \033[0m\n" "$1"
     if [ -n "${2-}" ]; then
-        echo -e "\x1B[34m[*] $($2) \x1B[0m"
+        printf "\033[34m[*] %s \033[0m\n" "$($2)"
     fi
 }
 
 function yellow() {
-    echo -e "\x1B[33m[*] $1 \x1B[0m"
+    printf "\033[33m[*] %s \033[0m\n" "$1"
     if [ -n "${2-}" ]; then
-        echo -e "\x1B[33m[*] $($2) \x1B[0m"
+        printf "\033[33m[*] %s \033[0m\n" "$($2)"
     fi
 }
 
@@ -201,3 +200,45 @@ function sops_setup_user_age_key() {
         green "Age key already exists for ${target_hostname}"
     fi
 }
+
+### Trap helpers
+
+# FIXME: Revisit the log, error, fatal functions with coloring, etc
+
+# From https://stackoverflow.com/questions/3338030/multiple-bash-traps-for-the-same-signal/7287873#7287873
+
+# note: printf is used instead of echo to avoid backslash
+# processing and to properly handle values that begin with a '-'.
+log() { printf '%s\n' "$*"; }
+error() { log "ERROR: $*" >&2; }
+fatal() {
+    error "$@"
+    exit 1
+}
+
+# appends a command to a trap
+#
+# - 1st arg:  code to add
+# - remaining args:  names of traps to modify
+#
+trap_add() {
+    trap_add_cmd=$1
+    shift || fatal "${FUNCNAME[1]} usage error"
+    for trap_add_name in "$@"; do
+        trap -- "$(
+            # helper fn to get existing trap command from output
+            # of trap -p
+            # shellcheck disable=SC2329
+            extract_trap_cmd() { printf '%s\n' "${3:-}"; }
+            # print existing trap command with newline
+            eval "extract_trap_cmd $(trap -p "${trap_add_name}")"
+            # print the new trap command
+            printf '%s\n' "${trap_add_cmd}"
+        )" "${trap_add_name}" ||
+            fatal "unable to add to trap ${trap_add_name}"
+    done
+}
+# set the trace attribute for the above function.  this is
+# required to modify DEBUG or RETURN traps because functions don't
+# inherit them unless the trace attribute is set
+declare -f -t trap_add

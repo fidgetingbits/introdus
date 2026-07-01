@@ -38,6 +38,10 @@
         wrappers = {
           neovim = nixpkgs.lib.modules.importApply ./wrappers/neovim inputs;
         };
+        # Expose base neovim wrapper to be further extended by personal configs
+        flake.wrappers = {
+          neovim = nixpkgs.lib.modules.importApply ./wrappers/neovim inputs;
+        };
       };
       systems = [
         "x86_64-linux"
