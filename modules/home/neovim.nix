@@ -11,15 +11,20 @@ let
 in
 {
   imports = [
-    (inputs.wrappers.lib.mkInstallModule {
-      loc = [
-        "home"
-        "packages"
-      ];
-      name = "neovim";
-      value = inputs.${cfg.wrapper}.wrapperModules.neovim;
-    })
+    inputs.flake-parts.flakeModules.modules
+    inputs.wrappers.flakeModules.wrappers
   ];
+
+  # imports = [
+  #   (inputs.wrappers.lib.mkInstallModule {
+  #     loc = [
+  #       "home"
+  #       "packages"
+  #     ];
+  #     name = "neovim";
+  #     value = inputs.${cfg.wrapper}.wrapperModules.neovim;
+  #   })
+  # ];
 
   options.introdus.neovim = {
     enable = lib.mkEnableOption "Enable neovim wrapper";
@@ -37,6 +42,9 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    flake.wrapper.neovim = inputs.${cfg.wrapper}.wrapperModules.neovim;
+    flake.modules.homeManager.neovim = config.flake.wrappers.neovim.install;
+
     wrappers.neovim = {
       enable = true;
       settings = {
