@@ -9,6 +9,7 @@ rec {
     inherit lib;
     inherit (secrets) ports;
   };
+  microvms = import ./microvms.nix;
 
   # use path relative to the root of the project
   relativeToRoot = lib.path.append ../.;
