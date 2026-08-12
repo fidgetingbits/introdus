@@ -37,6 +37,17 @@ imports = [
 ];
 ```
 
+### REQUIRED: Import the wrappers install module
+
+This is required since the nix-wrapper-module `mkInstallModule` function became deprecated.
+In your config where you setup your `introdus.neovim` you will have to do something like this:
+
+```nix
+  imports = [ inputs.fidgetingvim.wrappers.neovim.install ];
+```
+
+Where `fidgetingvim` above is your standalone neovim flake, or wherever you setup the wrapper.
+
 ### REQUIRED: Initializing the base config
 
 The wrapper extending introdus must initialize the introdus lua config
@@ -109,7 +120,6 @@ If you want to set them in your nixos-config you can do something like this:
 {
   introdus.neovim = {
     enable = true;
-    wrapper = "fidgetingvim";
   };
 
   wrappers.neovim = {

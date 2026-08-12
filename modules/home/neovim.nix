@@ -1,6 +1,5 @@
 {
   pkgs,
-  inputs,
   lib,
   config,
   osConfig,
@@ -10,24 +9,8 @@ let
   cfg = config.introdus.neovim;
 in
 {
-  imports = [
-    (inputs.wrappers.lib.mkInstallModule {
-      loc = [
-        "home"
-        "packages"
-      ];
-      name = "neovim";
-      value = inputs.${cfg.wrapper}.wrapperModules.neovim;
-    })
-  ];
-
   options.introdus.neovim = {
     enable = lib.mkEnableOption "Enable neovim wrapper";
-    wrapper = lib.mkOption {
-      type = lib.types.str;
-      example = "fidgetingvim";
-      description = "Name of neovim wrapper flake input";
-    };
     fontSize = lib.mkOption {
       type = lib.types.int;
       default = 12;
