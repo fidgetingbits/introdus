@@ -20,9 +20,6 @@ vim.o.inccommand = 'split'
 -- See zT/zB for bypass
 vim.o.scrolloff = 5
 
--- Unlimited scrollback in terminal
-vim.o.scrollback = -1
-
 -- Make line numbers default
 vim.wo.number = true
 
@@ -44,7 +41,6 @@ vim.o.expandtab = true
 
 -- stops line wrapping from being confusing
 vim.o.breakindent = true
-vim.o.linebreak = true
 
 -- Save undo history
 vim.o.undofile = true

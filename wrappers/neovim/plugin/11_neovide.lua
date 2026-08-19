@@ -16,5 +16,6 @@ if vim.g.neovide then
   vim.keymap.set({ "t", "n", "v" }, "<C-=>", function()
     vim.g.neovide_scale_factor = 1
   end)
+
   -- stylua: ignore end
 end

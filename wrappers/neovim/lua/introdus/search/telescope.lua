@@ -59,6 +59,7 @@ local function custom_find_files(opts, no_ignore)
       no_ignore = not no_ignore
       custom_find_files({ default_text = prompt }, no_ignore)
     end)
+
     return true
   end
 
@@ -146,15 +147,18 @@ return {
       { t .. "g", function() return require('telescope.builtin').live_grep() end,   mode = { "n" }, desc = '[F]ind by [G]rep', },
       { t .. "G", live_grep_git_root,                                               mode = { "n" }, desc = '[F]ind git [P]roject root', },
       { t .. "h", function() return require('telescope.builtin').help_tags() end,   mode = { "n" }, desc = '[F]ind [H]elp', },
-      { t .. "H", function() return require('telescope.builtin').highlights() end,   mode = { "n" }, desc = '[F]ind [H]ighlights / color map', },
+      { t .. "H", function() return require('telescope.builtin').highlights() end,  mode = { "n" }, desc = '[F]ind [H]ighlights / color map', },
       { t .. "k", function() return require('telescope.builtin').keymaps() end,     mode = { "n" }, desc = '[F]ind [K]eymaps', },
       { "<c-/>",  function() return require('telescope.builtin').keymaps() end,     mode = { "n" }, desc = 'Find Keymaps', },
       { t .. "l", function() return require('telescope.builtin').builtin({include_extensions = true}) end, mode = { "n" }, desc = "[F]ind telescope commands", },
+      { t .. "m", function() return require('telescope.builtin').marks() end,       mode = { "n" }, desc = '[F]ind [M]arks', },
+      { t .. "M", function() return require('telescope.builtin').man_pages() end,   mode = { "n" }, desc = '[F]ind [M]an pages', },
       { t .. "n", '<cmd>Telescope notify<CR>',                                      mode = { "n" }, desc = '[F]ind [N]otifications', },
       { t .. "P", function() return require('telescope.builtin').git_files() end,   mode = { "n" }, desc = '[F]ind [P]roject Root Files', },
       { t .. "r", function() return require('telescope.builtin').resume() end,      mode = { "n" }, desc = '[F]ind [R]esume', },
       { t .. 'S', '<cmd>Telescope resession<CR>', mode = { 'n' }, desc = '[F]ind sessions', },
       { t .. "t", '<cmd>Telescope toggleterm<CR>', mode = { "n" }, desc = '[F]ind [T]erminals', },
+      { t .. "q", function() return require('telescope.builtin').quickfix() end,    mode = { "n" }, desc = '[F]ind [Q]uickfix', },
       { t .. "w", function() return require('telescope.builtin').grep_string() end, mode = { "n" }, desc = '[F]ind current [W]ord', },
       -- Because <leader>xx toggles diagnostic quicklist
       { t .. "x", function() return require('telescope.builtin').diagnostics() end, mode = { "n" }, desc = '[F]ind Diagnostics', },
@@ -176,7 +180,14 @@ return {
       require('telescope').setup({
         defaults = {
           mappings = {
-            i = { ['<c-enter>'] = 'to_fuzzy_refine' },
+            i = {
+              ['<c-enter>'] = 'to_fuzzy_refine',
+              ['<C-y>'] = function(_)
+                local selection = require('telescope.actions.state').get_selected_entry()
+                vim.fn.setreg('+', selection[1])
+                vim.notify('Copied path: ' .. selection[1])
+              end,
+            },
           },
           file_ignore_patterns = telescope_ignore_patterns,
           layout_strategy = 'flex', -- Change layout depending on if on laptop screen or dualup
@@ -193,8 +204,8 @@ return {
               height = 0.95,
             },
           },
+          -- pickers = {}
         },
-        -- pickers = {}
         extensions = {
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),

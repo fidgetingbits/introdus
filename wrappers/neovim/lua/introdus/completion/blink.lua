@@ -13,6 +13,7 @@ return {
   },
   {
     'blink.cmp',
+    dep_of = { 'minuet-ai.nvim' },
     event = 'DeferredUIEnter',
     after = function(_)
       require('blink.cmp').setup({
@@ -118,6 +119,7 @@ return {
         },
         sources = {
           default = { 'spell', 'conventional_commits', 'lsp', 'path', 'snippets', 'buffer', 'omni' },
+          -- FIXME: Make this score_offsets more sane
           providers = {
             path = {
               score_offset = 50,

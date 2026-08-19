@@ -1,6 +1,6 @@
 return {
   {
-    -- NOTE: See blink for keymap
+    -- NOTE: See blink for trigger keymap, and below for inner-snippet keymap
     'luasnip',
     lazy = false,
     dep_of = { 'blink.cmp' },
@@ -64,25 +64,25 @@ return {
         if ls.expand_or_jumpable() then
           ls.expand_or_jump()
         end
-      end, { silent = true })
+      end, { silent = true, desc = 'luasnip: move to next placeholder' })
 
       vim.keymap.set({ 'i', 's' }, '<c-j>', function()
         if ls.jumpable(-1) then
           ls.jump(-1)
         end
-      end, { silent = true })
+      end, { silent = true, desc = 'luasnip: move to next placeholder' })
 
       vim.keymap.set({ 'i', 's' }, '<c-l>', function()
         if ls.choice_active() then
           ls.change_choice(1)
         end
-      end, { silent = true })
+      end, { silent = true, desc = 'luasnip: cycle active choice' })
 
       vim.keymap.set({ 'i', 's' }, '<C-f>', function()
         if ls.choice_active() then
           require('luasnip.extras.select_choice')()
         end
-      end, { desc = 'Select luasnip choice' })
+      end, { desc = 'luasnip: Select choice' })
     end,
   },
   {

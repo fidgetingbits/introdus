@@ -56,3 +56,12 @@ vim.b.minisurround_config = {
     },
   },
 }
+vim.b.miniai_config = {
+  custom_textobjects = {
+    -- Select `ic` as content from first to last non-blank characters
+    -- Selection is charwise by default, so common usages are:
+    -- - `cic` to "change inside codeblock";
+    -- - `Vacd` to "select linewise around codeblock and delete".
+    c = { '```[^\n]*\n%s*().-()\n%s*```' },
+  },
+}

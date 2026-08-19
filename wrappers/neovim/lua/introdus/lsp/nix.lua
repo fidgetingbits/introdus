@@ -1,15 +1,18 @@
+-- Lots of settings to possibly lift from here:
+-- https://github.com/olafkfreund/nixos_config/blob/1225de8137ca0a3bc67f95a50724013e03de6869/home/shell/lazyvim/lazyvim/lua/plugins/nix.lua#L22
 local get_nixd_opts = nixInfo(nil, 'info', 'nixdExtras', 'get_configs')
 return {
   {
     'nixd',
     lsp = {
       filetypes = { 'nix' },
-      cmd = { 'nixd', '--log=error', '--inlay-hints=true', '--semantic-tokens=true', '--pretty' },
+      -- cmd = { 'nixd', '--log=error', '--inlay-hints=true', '--semantic-tokens=true', '--pretty' },
+      cmd = { 'nixd', '--log=info', '--inlay-hints=true', '--semantic-tokens=true', '--pretty' },
       settings = {
         nixd = {
-          nixpkgs = {
-            expr = nixInfo('import <nixpkgs> {}', 'info', 'nixdExtras', 'nixpkgs'),
-          },
+          -- nixpkgs = {
+          --   expr = nixInfo('import <nixpkgs> {}', 'info', 'nixdExtras', 'nixpkgs'),
+          -- },
           options = {
             -- nixdExtras.nixos_options = ''(builtins.getFlake "path:${lib.toString inputs.self.outPath}").nixosConfigurations.configname.options''
             nixos = {
@@ -23,6 +26,7 @@ return {
             },
             target = {
               args = {},
+              -- installable = '.#',
             },
           },
           formatting = {
@@ -31,16 +35,27 @@ return {
           diagnostic = {
             suppress = {},
           },
-          completion = {
-            enable = true,
-            priority = 10,
-            insertSingleCandidateImmediately = true,
-          },
+          -- completion = {
+          --   enable = true,
+          --   priority = 10,
+          --   insertSingleCandidateImmediately = true,
+          -- },
           eval = {
             target = {
               args = {},
+              -- installable = '.#',
+              -- expr = 'builtins',
             },
+            --   expr = 'let pkgs = '
+            --     .. nixInfo('import <nixpkgs> {}', 'info', 'nixdExtras', 'nixpkgs')
+            --     .. '; in pkgs.lib // pkgs.builtins',
+            -- },
             depth = 10,
+            -- workers = 3,
+            -- trace = {
+            --   server = 'off',
+            --   evaluation = 'off',
+            -- },
           },
         },
       },

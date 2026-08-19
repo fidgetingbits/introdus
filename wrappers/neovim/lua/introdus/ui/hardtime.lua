@@ -4,6 +4,7 @@ return {
     event = 'DeferredUIEnter',
     after = function(plugin)
       require('hardtime').setup({
+        disable_mouse = false,
         -- I too often scroll code while drinking, etc
         restricted_keys = {
           ['h'] = false,

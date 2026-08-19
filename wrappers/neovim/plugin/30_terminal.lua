@@ -21,10 +21,6 @@ if nixInfo(false, 'settings', 'terminalMode') then
       -- there is only one split open and it's a terminal though
       vim.opt.laststatus = 2
     end)
-
-    -- FIXME: Some people unset this for terminal, but I can't get mouse to work
-    -- at all in neovide, so leaving for now
-    -- vim.opt.mouse = vim.opt.mouse - 'a'
   end
 
   --  NOTE: This function prevents relative numbers showing up in normal
@@ -60,13 +56,6 @@ if nixInfo(false, 'settings', 'terminalMode') then
       vim.cmd('startinsert')
       vim.opt_local.spell = false
       term_settings()
-
-      -- FIXME: this doesn't work afaik. Also given the mode caching we do
-      -- we likely want this to just focus the screen, rather than insert anyway
-      -- if we do want insert, we ought to run startinsert cmd vs keymap
-      -- insert mode when clicking in terminal
-      -- https://vi.stackexchange.com/questions/22307/neovim-go-into-insert-mode-when-clicking-in-a-terminal-in-a-pane
-      vim.api.nvim_buf_set_keymap(0, 'n', '<LeftRelease>', '<LeftRelease>i', { noremap = true })
     end,
     group = terminal_group,
     pattern = 'term://*',
@@ -122,6 +111,7 @@ if nixInfo(false, 'settings', 'terminalMode') then
     group = terminal_group,
     pattern = 't:*', -- Leaving Terminal mode
     callback = function()
+      -- vim.notify('Entering terminal')
       if vim.bo.buftype == 'terminal' then
         vim.b.last_terminal_mode = 'n'
       end
@@ -131,6 +121,7 @@ if nixInfo(false, 'settings', 'terminalMode') then
   vim.api.nvim_create_autocmd('ModeChanged', {
     pattern = '*:t', -- Entering Terminal mode
     callback = function()
+      -- vim.notify('Entering terminal')
       if vim.bo.buftype == 'terminal' then
         vim.b.last_terminal_mode = 't'
       end
@@ -142,10 +133,13 @@ if nixInfo(false, 'settings', 'terminalMode') then
     group = terminal_group,
     callback = function()
       local last_mode = vim.b.last_terminal_mode or 't'
-
       if last_mode == 't' then
         vim.cmd('startinsert')
       else
+        -- A mouse click out of a terminal buffer actually changes it to 'n' prior to leaving
+        -- so check where the cursor was. If it was at the bottom (on the cursor line), assume
+        -- it was in insert mode
+        -- vim.notify('cursor position: ' .. vim.b.terminal_cursor_line)
         vim.cmd('stopinsert')
       end
     end,
@@ -177,8 +171,7 @@ if nixInfo(false, 'settings', 'terminalMode') then
   local nvt = { 'n', 'x', 't' }
   local nvti = { 'n', 'x', 't', 'i' }
 
-  -- TODO: Try out <A-space> or <A-enter> for this as matches niri style
-  local term_trigger = '<A-s>'
+  local term_trigger = '<C-cr>'
 
   local function direction_name(key)
     local name = ''
@@ -205,6 +198,12 @@ if nixInfo(false, 'settings', 'terminalMode') then
       split_and_follow(dir)
     end, { desc = 'Split window ' .. direction_name(dir) })
 
+    -- Capital direction to open an empty at that location
+    vim.keymap.set(nvti, '<A-S-p>' .. dir, function()
+      split_and_follow(dir)
+      vim.cmd.enew()
+    end, { desc = 'Split empty buffer window ' .. direction_name(dir) })
+
     -- Spawn terminal in direction
     vim.keymap.set(nvti, term_trigger .. dir, function()
       split_and_follow(dir)
@@ -215,7 +214,7 @@ if nixInfo(false, 'settings', 'terminalMode') then
   -- Toggle fullscreen via zenmode
   -- This is different than actual zen mode (<leader>zz), but we just
   -- use it for convenience vs some other plugin
-  function full_screen()
+  local function full_screen()
     require('zen-mode').toggle({
       window = {
         width = 0.85, -- width will be 85% of the editor width
@@ -227,7 +226,8 @@ if nixInfo(false, 'settings', 'terminalMode') then
   vim.keymap.set(nvt, '<A-f>', full_screen, { silent = true, desc = 'Toggle full screen' })
 
   -- Spawn new in current buffer
-  vim.keymap.set('n', term_trigger .. 'n', vim.cmd.term, { desc = 'Spawn terminal' })
+  vim.keymap.set('n', term_trigger .. '<cr>', vim.cmd.term, { desc = 'Spawn terminal' })
+
   -- stylua: ignore
   vim.keymap.set('n', term_trigger .. 'N', '<cmd>:tabnew | terminal<CR>', { desc = 'Spawn terminal in tab' })
 

@@ -122,7 +122,7 @@ return {
       vim.keymap.set(xo , 'as',        function() select_textobject('@local.scope') end)
 
       -- [[ swapping ]]
-      -- FIXME: revisit these mappings. <leader>a conflicts with ai stuff
+      -- FIXME: Not sure about the best map for these...
       vim.keymap.set('n', '<leader><leader>a', function() swap_next('@parameter.inner') end)
       vim.keymap.set('n', '<leader><leader>A', function() swap_previous('@parameter.outer') end)
 

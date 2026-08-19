@@ -1,4 +1,6 @@
 -- Reloads /plugin files for now only
+-- NOTE: You can use ":restart" as of nvim 0.12 but it's slow (~15s on this config), so for
+-- small changes, it's still better to use this
 vim.api.nvim_create_user_command('ReloadConfig', function()
   -- Source init.lua
   config_folder = nixInfo(false, 'settings', 'config_directory')
@@ -25,7 +27,29 @@ vim.api.nvim_create_user_command('ReloadConfig', function()
   -- Force re-detection of filetype for the current buffer
   vim.cmd('filetype detect')
 
-  vim.cmd('ReloadSnippets')
-
   print('Configuration reloaded!')
 end, {})
+
+vim.api.nvim_create_user_command('Inspect', function(opts)
+  local chunk, err = load('return ' .. opts.args)
+  if not chunk then
+    vim.notify('Error: ' .. err, vim.log.levels.ERROR)
+    return
+  end
+
+  local success, result = pcall(chunk)
+  if not success then
+    vim.notify('Error evaluating: ' .. result, vim.log.levels.ERROR)
+    return
+  end
+
+  local buf = vim.api.nvim_create_buf(false, true)
+  vim.cmd('vnew')
+  vim.api.nvim_win_set_buf(0, buf)
+
+  local lines = vim.split(vim.inspect(result), '\n')
+  vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+
+  vim.api.nvim_set_option_value('filetype', 'lua', { buf = buf })
+  vim.api.nvim_set_option_value('bufhidden', 'wipe', { buf = buf })
+end, { nargs = 1 })

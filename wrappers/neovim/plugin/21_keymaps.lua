@@ -78,6 +78,7 @@ vim.keymap.set("n", l .. "o", vim.cmd.LspStart, { desc = 'Turn on LSP' })
 --
 -- l = "<A-b>"
 l = "<leader>b"
+vim.keymap.set(nv, l .. "b", vim.cmd.enew,    { desc = 'Empty buffer' })
 vim.keymap.set(nv, l .. "h", vim.cmd.bprev,   { desc = 'Previous buffer' })
 vim.keymap.set(nv, l .. "l", vim.cmd.bnext,   { desc = 'Next buffer' })
 vim.keymap.set(nv, l .. ".", "<cmd>b#<CR>",   { desc = 'Most recent buffer' })
@@ -176,17 +177,21 @@ vim.keymap.set('n', 'zB', function()
   scroll('zb')
 end, { desc = "Force zt ignoring scrolloff" })
 
--- Remap marks since m is used elsewhere
-vim.keymap.set('n', '<leader>m', 'm', {noremap=true, silent=true, desc = "[m]arks: Set [a-z]"})
 
 --
 -- [[ Notifications ]]
 --
 
+
+-- FIXME: If you use the :Noice last command it will give you a pop-up window with the
+-- list of past notifications. This won't close with dismiss above
+-- but I find I expect it to. So this searches all active windows for poups, and
+-- if they are noice popups, then close them
 local function dismiss_all()
   require("noice").cmd("dismiss")
   require("notify").dismiss({ silent = true })
   vim.cmd("noh")
+
 end
 
 vim.keymap.set("n", "<Esc>", dismiss_all, { desc = "Dismiss all notifications and clear hlsearch" })
@@ -212,5 +217,30 @@ vim.keymap.set('i', 'jk', '<ESC>:w<CR>', {noremap=true, silent=true})
 -- 4. Set undo breakpoint
 -- From: https://github.com/theopn/dotfiles/blob/c96a769b/vim/.vimrc
 vim.keymap.set({"i", "n", "o"}, "<C-s>", "<C-g>u<ESC>[s1z=`]a<C-g>u", { desc = "Auto-spell correct"})
+
+-- Motion paste like "<leader>pinq" using mini.ai motions this is paste inside next string
+_G.paste_operator = function(type)
+  local start_mark = vim.api.nvim_buf_get_mark(0, '[')
+  local end_mark = vim.api.nvim_buf_get_mark(0, ']')
+
+  -- Use the unnamed/clipboard register (or modify to standard '"')
+  local reg_content = vim.fn.getreg('"')
+  local reg_type = vim.fn.getregtype('"')
+
+  -- Replace the region selected by the motion with the register content
+  vim.api.nvim_buf_set_text(
+    0,
+    start_mark[1] - 1,
+    start_mark[2],
+    end_mark[1] - 1,
+    end_mark[2] + 1,
+    vim.split(reg_content, '\n')
+  )
+end
+
+vim.keymap.set('n', '<leader>p', function()
+  vim.o.operatorfunc = 'v:lua.paste_operator'
+  return 'g@'
+end, { expr = true, desc = "Paste into <motion>" })
 
 -- stylua: ignore end

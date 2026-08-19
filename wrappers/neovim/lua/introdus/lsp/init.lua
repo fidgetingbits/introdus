@@ -46,11 +46,10 @@ return {
           local l = '<leader>l'
           local tb = require('telescope.builtin')
           -- stylua: ignore start
-          nmap('gd',      vim.lsp.buf.definition,              '[G]oto [D]efinition')
           -- nmap('gr',      tb.lsp_references,                   '[G]oto [R]eferences')
-
-          -- nmap(l .. 'd',  vim.lsp.buf.definition,              'Goto [D]efinition')
           nmap(l .. 'R',  tb.lsp_references,                   'Goto [R]eferences')
+          -- Think xrefs
+          nmap(l .. 'x',  tb.lsp_references,                   'Goto [R]eferences')
           nmap(l .. 'I',  tb.lsp_implementations,              'Goto [I]mplementation')
           nmap(l .. 'ds', tb.lsp_document_symbols,             '[D]ocument [S]ymbols')
           nmap(l .. 'ws', tb.lsp_dynamic_workspace_symbols,    '[W]orkspace [S]ymbols')
@@ -60,12 +59,20 @@ return {
           nmap(l .. 'td', vim.lsp.buf.type_definition,         '[T]ype [D]efinition')
           nmap(l .. 'k',  vim.lsp.buf.hover,                   'Hover Documentation')
           nmap(l .. 'K',  vim.lsp.buf.signature_help,          'Signature Documentation')
+
+          nmap('gd',      vim.lsp.buf.definition,              '[G]oto [D]efinition')
+          nmap(l .. 'd',  vim.lsp.buf.definition,              '[G]oto [D]efinition')
           nmap(l .. 'D',  vim.lsp.buf.declaration,             'Goto [D]eclaration')
+
           nmap(l .. 'wa', vim.lsp.buf.add_workspace_folder,    '[W]orkspace [A]dd Folder')
           nmap(l .. 'wr', vim.lsp.buf.remove_workspace_folder, '[W]orkspace [R]emove Folder')
           nmap(l .. 'wl', function()
             print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
           end,                                                 '[W]orkspace [L]ist Folders')
+          nmap(l .. 'H', vim.cmd("checkhealth vim.lsp"),       'Show LSP heatlh status')
+
+          -- clangd only
+          nmap(l .. 'h', vim.cmd.LspClangdSwitchSourceHeader, 'Swap between source and header files')
           -- stylua: ignore end
 
           -- NOTE: See conform.lua for formatting with lsp fallback
@@ -74,6 +81,7 @@ return {
     end,
   },
   { import = MP:relpath('bash') },
+  { import = MP:relpath('ctags') },
   { import = MP:relpath('clang') },
   { import = MP:relpath('json') },
   { import = MP:relpath('just') },

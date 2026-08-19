@@ -73,3 +73,20 @@ vim.api.nvim_create_autocmd('TabClosed', {
 --   end,
 --   group = tablisttrack,
 -- })
+
+-- FIXME: Haven't looked too hard to see if something that exists for this
+vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
+  pattern = { '*.sieve', '*.sv' },
+  callback = function()
+    vim.bo.filetype = 'sieve'
+  end,
+})
+
+vim.api.nvim_create_autocmd('BufWritePre', {
+  pattern = '*.sieve',
+  callback = function()
+    local saved_view = vim.fn.winsaveview()
+    vim.cmd([[normal! gg=G]])
+    vim.fn.winrestview(saved_view)
+  end,
+})

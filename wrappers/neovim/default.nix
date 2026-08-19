@@ -7,15 +7,20 @@ inputs:
   ...
 }:
 let
+  # FIXME: Make this work
+  # configSource = lib.introdus.neovim.configSource ./.;
   configSource = lib.fileset.toSource {
     root = ./.;
-    fileset = lib.fileset.unions [
-      ./init.lua
-      ./lua
-      ./after
-      ./plugin
-      ./snippets
-    ];
+    fileset =
+      map (p: lib.optional (lib.pathExists p) p) [
+        ./init.lua
+        ./lua
+        ./after
+        ./plugin
+        ./snippets
+      ]
+      |> lib.flatten
+      |> lib.fileset.unions;
   };
 in
 {
@@ -280,6 +285,7 @@ in
         extraPackages = lib.attrValues {
           inherit (pkgs)
             bash-language-server
+            ctags-lsp # fallback lsp
             just-lsp
             lua-language-server # lua_ls
             marksman # markdown
@@ -577,7 +583,7 @@ in
           description = "an optional mainInfo spec field to add to the main info plugin instead of the spec specific one";
         };
       };
-    extraPackages = config.specCollect (acc: v: acc ++ (v.extraPackages or [ ])) [ ];
+    runtimePkgs = config.specCollect (acc: v: acc ++ (v.extraPackages or [ ])) [ ];
 
     info = lib.mkMerge (
       config.specCollect (acc: v: acc ++ lib.optional (v.mainInfo or { } != { }) v.mainInfo) [ ]
