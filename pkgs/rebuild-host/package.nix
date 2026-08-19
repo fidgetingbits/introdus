@@ -1,17 +1,15 @@
 # Tool used to rebuild the system configuration on a remote host or the local host.
-#
-# FIXME: I didn't port the BUILD_LOG logic from rebuild.sh since I haven't been using
-# it lately.
 {
-  stdenvNoCC,
-  pkgs,
-  lib,
-  introdus,
-  rsync,
-  openssh,
+  curlMinimal,
   git,
+  introdus,
+  lib,
   nix,
+  openssh,
+  pkgs,
+  rsync,
   sops,
+  stdenvNoCC,
   ...
 }:
 stdenvNoCC.mkDerivation (
@@ -20,10 +18,11 @@ stdenvNoCC.mkDerivation (
     shellScript = pkgs.writeShellApplication {
       name = "rebuild-host";
       runtimeInputs = [
-        rsync
-        openssh
+        curlMinimal
         git
         nix
+        openssh
+        rsync
         sops
       ];
       runtimeEnv = {
