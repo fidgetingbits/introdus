@@ -26,8 +26,7 @@ let
   allLibNames =
     lib.mapAttrsRecursive (path: value: if (lib.isFunction value) then path else null) pkgs.stable.lib
     |> lib.attrNames
-    |> lib.filter (x: !(builtins.isNull x));
-
+    |> lib.filter (x: (x != null));
   regexPattern =
     (lib.attrNames builtins ++ impureBuiltins)
     |> lib.filter (b: !(lib.elem b allLibNames))
