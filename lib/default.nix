@@ -1,4 +1,8 @@
-{ lib, secrets, ... }:
+{
+  lib,
+  secrets,
+  ...
+}:
 rec {
   # sub libs
   time = import ./time.nix;
@@ -9,6 +13,7 @@ rec {
     inherit lib;
     inherit (secrets) ports;
   };
+  microvm = import ./microvm.nix;
 
   # use path relative to the root of the project
   relativeToRoot = lib.path.append ../.;
