@@ -28,13 +28,13 @@ in
       description = "List of extra extensions to add, in addition to the introdus defaults";
       type = lib.types.listOf (lib.types.attrsOf lib.types.anything);
       default = [ ];
-      example = "[ (import ./extraExtensions.nix { inherit lib; }]";
+      example = "[ (import ./extraExtensions.nix { inherit lib; }) ]";
     };
     search = lib.mkOption {
       description = "List of extra search engines to add, in addition to the introdus defaults";
       type = lib.types.listOf (lib.types.attrsOf lib.types.anything);
       default = [ ];
-      example = "[ (import ./extraSearch.nix { inherit lib; }]";
+      example = "[ (import ./extraSearch.nix { inherit lib; }) ]";
     };
   };
 
@@ -63,7 +63,7 @@ in
             };
             DontCheckDefaultBrowser = true;
             OfferToSaveLogins = false;
-            HttpsOnlyMode = true;
+            HttpsOnlyMode = "force_enabled";
             StartDownloadsInTempDirectory = true; # Avoid failed download clutter
             UserMessaging = {
               ExtensionRecommendations = false;
@@ -107,6 +107,10 @@ in
                 "browser.aboutConfig.showWarning" = false;
                 "browser.download.dir" = "${homeDir}/downloads";
                 "browser.startup.page" = 3; # restore previous session
+                # Inline PDF viewing preserves the "Save As" dialog so users
+                # can choose the save location, instead of auto-downloading
+                # to a temp directory with no user interaction.
+                "browser.download.open_pdf_attachments_inline" = true;
 
                 "browser.tabs.firefox-view" = true; # Sync tabs across devices
                 "ui.systemUsesDarkTheme" = 1; # force dark theme
