@@ -48,7 +48,8 @@ rec {
       mac = (if opts ? "mac" && lib.isList opts.mac then opts.mac else [ opts.mac or "" ]);
       user = opts.user or "";
       sshPort = opts.sshPort or ports.tcp.ssh;
-      wgpk = opts.wgpk or "";
+      sshPubKey = opts.sshPubKey or "";
+      wireguardPubKey = opts.wireguardPubKey or "";
     };
   };
 
@@ -63,6 +64,15 @@ rec {
         mac
         ;
     };
+
+  mkWireguardPeer = host: {
+    inherit (host) name;
+    publicKey =
+      assert lib.assertMsg (host.wireguardPubKey != "") "peer must have valid key";
+      host.wireguardPubKey;
+    allowedIPs = [ "${host.ip}/32" ];
+  };
+  mkWireguardPeers = hosts: (map (host: mkWireguardPeer host) hosts);
 
   incrementLastIPOctet =
     ip:
@@ -116,4 +126,35 @@ rec {
       (makeSimpleHost "${name}_vpn" vpnIP vpnMac user)
     ];
 
+  # 0-pad a mac entry if it's less than 1 hex nibble
+  zeroPad = s: if lib.stringLength s == 1 then "0${s}" else s;
+  lastOctetAsHex =
+    ip:
+    ip
+    |> lib.splitString "."
+    |> lib.last
+    |> lib.toInt
+    |> lib.toHexString
+    |> zeroPad;
+  genMac = prefix: ip: "${prefix}${lastOctetAsHex ip}";
+
+  genWireguardIPFixed = subnet: suffix: "${triplet subnet.cidr}.${toString suffix}";
+  genWireguardIPAuto = subnet: ip: "${triplet subnet.cidr}.${toString (lastOctet ip)}";
+  mkWireguardHost = subnet: host: {
+    "${host.name}" = host // {
+      ip = genWireguardIPAuto subnet host.ip;
+    };
+  };
+  mkWireguardHostFixed = subnet: host: suffix: {
+    "${host.name}" = host // {
+      ip = genWireguardIPFixed subnet suffix;
+    };
+  };
+
+  mkMicroHost =
+    name: ip: user: prefix:
+    (makeHost rec {
+      inherit name ip user;
+      mac = genMac prefix ip;
+    });
 }
