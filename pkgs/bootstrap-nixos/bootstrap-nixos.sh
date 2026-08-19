@@ -201,6 +201,7 @@ function nixos_anywhere() {
 
         $ssh_root_cmd 'nix --extra-experimental-features "flakes nix-command" run github:nix-community/nixos-facter > facter.json'
         $scp_cmd root@"$target_destination":facter.json "$git_root"/hosts/nixos/"$target_hostname"/facter.json
+        # FIXME: This breaks when using isolated build folder
         git add "$git_root"/hosts/nixos/"$target_hostname"/facter.json
         generated_hardware_config=1
     fi
