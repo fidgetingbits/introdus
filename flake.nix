@@ -28,16 +28,15 @@
           default = self.nixosModules.introdus;
           introdus = ./modules/nixos;
         };
-
         homeManagerModules = {
           default = self.homeManagerModules.introdus;
           introdus = ./modules/home;
         };
-
         # Expose base neovim wrapper to be further extended by personal configs
         wrappers = {
           neovim = nixpkgs.lib.modules.importApply ./wrappers/neovim inputs;
         };
+
       };
       systems = [
         "x86_64-linux"
@@ -53,18 +52,6 @@
             inherit system;
             overlays = [
               self.overlays.default
-              # NOTE: Inject stable nixos pkgs for use by some packages (eg: unwanted-builtins)
-              # and unstable for standalone introdus use such as automated checks
-              (final: prev: {
-                stable = import inputs.nixpkgs-stable {
-                  system = final.stdenv.hostPlatform.system;
-                  config.allowUnfree = true;
-                };
-                unstable = import inputs.nixpkgs-unstable {
-                  system = final.stdenv.hostPlatform.system;
-                  config.allowUnfree = true;
-                };
-              })
             ];
           };
         in
@@ -136,6 +123,14 @@
     };
 
     ##
+    # Ricing
+    ##
+    silentSDDM = {
+      url = "github:uiriansan/SilentSDDM";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    ##
     # Neovim plugins not tracked by nixpkgs or that require newer versions
     ##
     plugins-nvim-toggler = {
@@ -158,6 +153,7 @@
       url = "github:nvim-treesitter/nvim-treesitter-textobjects";
       flake = false;
     };
+
     plugins-pick-resession = {
       url = "github:scottmckendry/pick-resession.nvim";
       flake = false;
