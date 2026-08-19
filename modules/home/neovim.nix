@@ -1,6 +1,5 @@
 {
   pkgs,
-  inputs,
   lib,
   config,
   osConfig,
@@ -10,24 +9,8 @@ let
   cfg = config.introdus.neovim;
 in
 {
-  imports = [
-    (inputs.wrappers.lib.mkInstallModule {
-      loc = [
-        "home"
-        "packages"
-      ];
-      name = "neovim";
-      value = inputs.${cfg.wrapper}.wrapperModules.neovim;
-    })
-  ];
-
   options.introdus.neovim = {
     enable = lib.mkEnableOption "Enable neovim wrapper";
-    wrapper = lib.mkOption {
-      type = lib.types.str;
-      example = "fidgetingvim";
-      description = "Name of neovim wrapper flake input";
-    };
     fontSize = lib.mkOption {
       type = lib.types.int;
       default = 12;
@@ -54,18 +37,20 @@ in
       };
     };
 
-    xdg.desktopEntries.nvim-neovide = {
-      name = "Neovide (Nvim Wrapper)";
-      genericName = "Text Editor";
-      exec = "nvim-neovide %F";
-      icon = "nvim";
-      terminal = false;
-      categories = [
-        "Utility"
-        "TextEditor"
-      ];
-      settings = {
-        StartupWMClass = "neovide";
+    xdg = lib.optionalAttrs config.wrappers.neovim.settings.neovide {
+      desktopEntries.nvim-neovide = {
+        name = "Neovide (Nvim Wrapper)";
+        genericName = "Text Editor";
+        exec = "nvim-neovide %F";
+        icon = "nvim";
+        terminal = false;
+        categories = [
+          "Utility"
+          "TextEditor"
+        ];
+        settings = {
+          StartupWMClass = "neovide";
+        };
       };
     };
 
@@ -115,16 +100,45 @@ in
           '';
     };
 
-    home =
-      let
-        # Wrapper in the vein of nvr, but shorter commands and using the wrapper
-      in
-      {
-        packages = [
-          pkgs.neovim-remote
-        ]
-        # Tool to allow you to easily open files from terminal in splits, etc
-        ++ lib.optional osConfig.hostSpec.useNeovimTerminal pkgs.page;
+    home.packages = [
+      pkgs.neovim-remote
+      pkgs.logrotate
+    ]
+    # Tool to allow you to easily open files from terminal in splits, etc
+    ++ lib.optional osConfig.hostSpec.useNeovimTerminal pkgs.page;
+
+    # lsp.log can get a little unruly at times, so limit it
+    systemd.user.services.logrotate-nvim = {
+      Unit = {
+        Description = "Rotate nvim LSP log";
       };
+      Service = {
+        Type = "oneshot";
+        ExecStartPre = "${pkgs.coreutils}/bin/mkdir --parents %h/.local/state/logrotate";
+        ExecStart = "${pkgs.logrotate}/bin/logrotate --state=%h/.local/state/logrotate/nvim.state %h/.config/logrotate/nvim.conf";
+      };
+    };
+    systemd.user.timers.logrotate-nvim = {
+      Unit = {
+        Description = "Timer for nvim LSP log rotation";
+      };
+      Timer = {
+        OnCalendar = "hourly";
+        Persistent = true;
+      };
+      Install = {
+        WantedBy = [ "timers.target" ];
+      };
+    };
+    home.file.".config/logrotate/nvim.conf".text = ''
+      ${config.home.homeDirectory}/.local/state/nvim/lsp.log {
+        size 1M
+        rotate 5
+        compress
+        copytruncate
+        missingok
+        notifempty
+      }
+    '';
   };
 }
