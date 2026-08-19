@@ -1,6 +1,4 @@
-# NOTE: `silentSDDM` must be an input to your nix-config flake that follows
-# nixpkgs-unstable. inputs.SilentSDDM.url = "github:uiriansan/SilentSDDM"
-# Also, enabling this module will enable introdus.x11
+# NOTE: Enabling this module will enable introdus.x11
 {
   inputs,
   config,
@@ -22,7 +20,8 @@ in
 
   imports = [ inputs.silentSDDM.nixosModules.default ];
   config = lib.mkIf cfg.enable {
-    # Use X11 because SDDM fails to run properly on multiple hosts with Radeon 9070
+    # Use X11 because SDDM+Wayland fails to run properly on multiple hosts
+    # with Radeon 9070
     introdus.services.x11.enable = true;
 
     programs.silentSDDM = {
