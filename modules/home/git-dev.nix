@@ -88,6 +88,17 @@ in
         description = "";
         # FIXME: add a check to ensure primary and work exist in the set
       };
+
+      extraForges = lib.mkOption {
+        type = lib.types.attrsOf lib.types.str;
+        default = {
+        };
+        example = {
+          "gitee.com" = "users.noreply";
+        };
+        description = "Additional set of forges and emails";
+      };
+
       devFolders = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [ ];
@@ -107,7 +118,7 @@ in
             ];
           };
         type = lib.types.attrsOf (lib.types.listOf lib.types.str);
-        description = "List of work servers to include ssh insteadOf url substitutions for";
+        description = "List of gitlab repos to include ssh insteadOf url substitutions for";
       };
 
       workFolders = lib.mkOption {
@@ -244,7 +255,7 @@ in
         # Order matters. Last match wins, so we want granular email changes last
         (mapFolders cfg.devFolders privateGitConfig)
         ++ (mapFolders cfg.workFolders workGitConfig)
-        ++ (mapRemotes forges);
+        ++ (mapRemotes (forges // cfg.extraForges));
 
       signing = {
         signByDefault = true;
@@ -323,8 +334,11 @@ in
         gl = "git log";
         glo = "git log --oneline";
         gc = "git clone";
+        gcl = "git clone $(wl-paste)"; # clone url from c[l]ipboard (can't use gcc :P)
+        gcs = "git clone --depth 1"; # shallow clone
         grst = "git reset --soft ";
         gsr = "git fetch && git rebase"; # "git smart rebase"
+        grp = ''f() { local rev=$(git rev-parse "$1"); echo "$rev"; echo "$rev" | wl-copy; }; f'';
       };
     };
 
