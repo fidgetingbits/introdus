@@ -5,10 +5,10 @@ Extract NixOS initrd to a directory.
 This script extracts multi-stage NixOS initrd images (microcode + zstd-compressed CPIO).
 """
 
-import os
-import sys
-import subprocess
 import argparse
+import os
+import subprocess
+import sys
 from pathlib import Path
 
 
@@ -73,7 +73,7 @@ def extract_initrd(initrd_path, output_dir):
     zstd_proc = subprocess.Popen(zstd_cmd, stdin=dd_proc.stdout, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
     dd_proc.stdout.close()  # Allow dd_proc to receive SIGPIPE if zstd_proc exits
 
-    cpio_proc = subprocess.run(cpio_cmd, stdin=zstd_proc.stdout, capture_output=True, text=True)
+    cpio_proc = subprocess.run(cpio_cmd, stdin=zstd_proc.stdout, capture_output=True, text=True, check=False)
     zstd_proc.stdout.close()
 
     # Wait for processes to complete
@@ -87,12 +87,12 @@ def extract_initrd(initrd_path, output_dir):
 
     print("\n✓ Extraction complete!")
     print("\nExtracted contents:")
-    subprocess.run(['ls', '-lah', str(output_path)])
+    subprocess.run(['ls', '-lah', str(output_path)], check=False)
 
     print("\n/etc directory contents:")
     etc_path = output_path / 'etc'
     if etc_path.exists():
-        subprocess.run(['ls', '-la', str(etc_path)])
+        subprocess.run(['ls', '-la', str(etc_path)], check=False)
 
     print(f"\nInitrd filesystem extracted to: {output_path}")
 
@@ -138,7 +138,7 @@ Examples:
 
     try:
         extract_initrd(initrd_path, args.output)
-    except Exception as e:
+    except BaseException as e: # noqa: BLE001
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)
 

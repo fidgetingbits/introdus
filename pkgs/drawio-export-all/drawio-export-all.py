@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 import os
-import sys
 import pathlib
-import shutil
 import shlex
-from multiprocessing import Process
+import shutil
+import sys
 import xml.etree.ElementTree as ET
+from multiprocessing import Process
+
 
 def export(cmd, file, name, index, total):
     """Export the specified tab from the file"""

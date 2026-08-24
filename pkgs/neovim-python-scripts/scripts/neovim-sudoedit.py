@@ -13,4 +13,4 @@ nvim = pynvim.attach("socket", path=os.environ["NVIM"])
 if len(sys.argv) <= 1:
     print("WARNING: Specify a path to edit")
 else:
-    nvim.command('execute ":SudaRead {}"'.format(sys.argv[1]))
+    nvim.command(f'execute ":SudaRead {sys.argv[1]}"')

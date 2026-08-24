@@ -1,4 +1,3 @@
-# FIXME: This could be made a lot less ghetto
 {
   pkgs,
   ...

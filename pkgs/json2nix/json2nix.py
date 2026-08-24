@@ -1,9 +1,8 @@
 # Modified from https://gitlab.com/-/snippets/3613708
 """Converts JSON objects into nix (hackishly)."""
 
-import sys
 import json
-
+import sys
 
 INDENT = " " * 2
 
@@ -58,12 +57,7 @@ def fmt_array(o, flatten):
 
 
 def fmt_any(o, flatten):
-    if (
-        isinstance(o, str)
-        or isinstance(o, bool)
-        or isinstance(o, int)
-        or isinstance(o, float)
-    ):
+    if isinstance(o, (str,bool,int,float)):
         return json.dumps(o)
     if isinstance(o, list):
         return fmt_array(o, flatten)
