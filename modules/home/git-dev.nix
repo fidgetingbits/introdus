@@ -118,7 +118,7 @@ in
             ];
           };
         type = lib.types.attrsOf (lib.types.listOf lib.types.str);
-        description = "List of gitlab repos to include ssh insteadOf url substitutions for";
+        description = "List of git repos to include ssh insteadOf url substitutions for";
       };
 
       workFolders = lib.mkOption {
