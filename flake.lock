@@ -100,6 +100,22 @@
         "type": "github"
       }
     },
+    "plugins-flash": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1787427371,
+        "narHash": "sha256-88DoXkz8M6ehkzS9VNu2/T0FENpduTbgiUZd+GeVVX4=",
+        "owner": "folke",
+        "repo": "flash.nvim",
+        "rev": "5f0f270fdc7c5b0c21d903ee85b9cb06f2ac636a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "folke",
+        "repo": "flash.nvim",
+        "type": "github"
+      }
+    },
     "plugins-nvim-better-n": {
       "flake": false,
       "locked": {
@@ -242,6 +258,7 @@
         "nixpkgs-stable": "nixpkgs-stable",
         "nixpkgs-unstable": "nixpkgs-unstable",
         "plugins-confirm-quit": "plugins-confirm-quit",
+        "plugins-flash": "plugins-flash",
         "plugins-nvim-better-n": "plugins-nvim-better-n",
         "plugins-nvim-toggler": "plugins-nvim-toggler",
         "plugins-pick-resession": "plugins-pick-resession",
