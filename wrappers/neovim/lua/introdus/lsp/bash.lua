@@ -11,7 +11,6 @@ return {
         -- This encourages use of GLOB_PATTERN in a .env file I guess?
         -- vim.env.GLOB_PATTERN or '*@(.sh|.inc|.bash|.command)',
         -- https://github.com/neovim/nvim-lspconfig/blob/1f7fbc34e6420476142b5cc85e9bee52717540fb/lsp/bashls.lua#L4
-        -- FIXME: Disable this if it becomes problematic
         bashIde = {
           globPattern = '**/*@(.sh|.inc|.bash|.command)',
         },

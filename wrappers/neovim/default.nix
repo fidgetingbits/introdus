@@ -189,6 +189,9 @@ in
   config = {
     # Build a neovide wrapper
     hosts.neovide.nvim-host.enable = config.settings.neovide;
+    # This is because noice complains due to this:
+    # https://github.com/neovide/neovide/blob/ba8c41f423c9a8f0cb14ff19baa6f538c95e52bf/website/docs/command-line-reference.md?plain=1#L225
+    hosts.neovide.nvim-host.flags."--no-startup-message-capture" = true;
 
     settings.config_directory =
       assert ((config.settings.hotReload == false) || (config.settings.unwrappedConfig != null));
@@ -264,7 +267,7 @@ in
         enable = config.settings.devMode;
         data = lib.attrValues {
           inherit (pkgs.vimPlugins)
-            lazydev-nvim # FIXME: switch this to specs.lua eventually
+            lazydev-nvim
             SchemaStore-nvim # json schemas
             nvim-lspconfig
             ;
@@ -310,13 +313,13 @@ in
               telescope-fzf-native-nvim
               telescope-ui-select-nvim
               telescope-zoxide
-              flash-nvim
               ;
           }
           ++ lib.optionals config.settings.devMode (
             lib.attrValues {
               inherit (config.nvim-lib.neovimPlugins)
                 telescope-luasnip
+                flash
                 ;
             }
           );
@@ -465,18 +468,25 @@ in
       completion = {
         after = [ "core" ];
         lazy = true;
-        data = lib.attrValues {
-          inherit (pkgs.vimPlugins)
-            blink-cmp
-            blink-cmp-conventional-commits
-            blink-cmp-spell
-            colorful-menu-nvim # provide additional info for completion suggestions
-            # FIXME: should snippets be on dev only?
-            friendly-snippets
-            vim-snippets
-            luasnip
-            ;
-        };
+        data =
+          (lib.attrValues {
+            inherit (pkgs.vimPlugins)
+              blink-cmp
+              blink-cmp-conventional-commits
+              blink-cmp-spell
+              colorful-menu-nvim # provide additional info for completion suggestions
+              luasnip
+              ;
+          })
+          ++ lib.optionals config.settings.devMode (
+            lib.attrValues {
+
+              inherit (pkgs.vimPlugins)
+                friendly-snippets
+                vim-snippets
+                ;
+            }
+          );
       };
 
       editing =

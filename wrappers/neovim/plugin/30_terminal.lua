@@ -226,10 +226,10 @@ if nixInfo(false, 'settings', 'terminalMode') then
   vim.keymap.set(nvt, '<A-f>', full_screen, { silent = true, desc = 'Toggle full screen' })
 
   -- Spawn new in current buffer
-  vim.keymap.set('n', term_trigger .. '<cr>', vim.cmd.term, { desc = 'Spawn terminal' })
+  vim.keymap.set(nvti, term_trigger .. '<cr>', vim.cmd.term, { desc = 'Spawn terminal' })
 
   -- stylua: ignore
-  vim.keymap.set('n', term_trigger .. 'N', '<cmd>:tabnew | terminal<CR>', { desc = 'Spawn terminal in tab' })
+  vim.keymap.set(nvti, term_trigger .. 'N', '<cmd>:tabnew | terminal<CR>', { desc = 'Spawn terminal in tab' })
 
   -- Rename terminal
   local function rename_term()

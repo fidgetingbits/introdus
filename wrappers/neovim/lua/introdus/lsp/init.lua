@@ -69,7 +69,7 @@ return {
           nmap(l .. 'wl', function()
             print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
           end,                                                 '[W]orkspace [L]ist Folders')
-          nmap(l .. 'H', vim.cmd("checkhealth vim.lsp"),       'Show LSP heatlh status')
+          nmap(l .. 'H', function() vim.cmd("checkhealth vim.lsp") end,       'Show LSP heatlh status')
 
           -- clangd only
           nmap(l .. 'h', vim.cmd.LspClangdSwitchSourceHeader, 'Swap between source and header files')

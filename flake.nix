@@ -166,5 +166,10 @@
       url = "github:fidgetingbits/resession.nvim?ref=visual-mode-fix";
       flake = false;
     };
+    # 2026-08-24 was broken on nightly, so need main
+    plugins-flash = {
+      url = "github:folke/flash.nvim";
+      flake = false;
+    };
   };
 }

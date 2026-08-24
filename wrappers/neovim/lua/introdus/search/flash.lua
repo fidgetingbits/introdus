@@ -1,6 +1,7 @@
 return {
   {
-    'flash.nvim',
+    -- 'flash.nvim',
+    'flash',
     event = { 'BufReadPost', 'BufNewFile' },
     -- stylua: ignore
     keys = {
