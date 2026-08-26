@@ -245,7 +245,7 @@ in
             ;
         };
 
-        extraPackages = lib.attrValues {
+        runtimePkgs = lib.attrValues {
           inherit (pkgs)
             fd
             ripgrep
@@ -277,7 +277,7 @@ in
               '';
         };
 
-        extraPackages = lib.attrValues {
+        runtimePkgs = lib.attrValues {
           inherit (pkgs)
             bash-language-server
             just-lsp
@@ -314,7 +314,7 @@ in
                 ;
             }
           );
-        extraPackages = lib.attrValues {
+        runtimePkgs = lib.attrValues {
           inherit (pkgs)
             zoxide
             ;
@@ -377,7 +377,7 @@ in
             }
           );
 
-        extraPackages = lib.attrValues {
+        runtimePkgs = lib.attrValues {
           inherit (pkgs)
             chafa
             ;
@@ -405,7 +405,7 @@ in
             conform-nvim
             ;
         };
-        extraPackages = lib.attrValues {
+        runtimePkgs = lib.attrValues {
           inherit (pkgs)
             fixjson
             kdlfmt
@@ -564,11 +564,11 @@ in
         ...
       }:
       {
-        # add an extraPackages field to the specs themselves
-        options.extraPackages = lib.mkOption {
+        # add an runtimePkgs field to the specs themselves
+        options.runtimePkgs = lib.mkOption {
           type = lib.types.listOf wlib.types.stringable;
           default = [ ];
-          description = "An extraPackages spec field to put packages to suffix to the PATH";
+          description = "An runtimePkgs spec field to put packages to suffix to the PATH";
         };
 
         options.mainInfo = lib.mkOption {
@@ -577,7 +577,7 @@ in
           description = "an optional mainInfo spec field to add to the main info plugin instead of the spec specific one";
         };
       };
-    extraPackages = config.specCollect (acc: v: acc ++ (v.extraPackages or [ ])) [ ];
+    runtimePkgs = config.specCollect (acc: v: acc ++ (v.runtimePkgs or [ ])) [ ];
 
     info = lib.mkMerge (
       config.specCollect (acc: v: acc ++ lib.optional (v.mainInfo or { } != { }) v.mainInfo) [ ]
