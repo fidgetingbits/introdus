@@ -153,7 +153,6 @@
       url = "github:nvim-treesitter/nvim-treesitter-textobjects";
       flake = false;
     };
-
     plugins-pick-resession = {
       url = "github:scottmckendry/pick-resession.nvim";
       flake = false;
@@ -169,6 +168,16 @@
     # 2026-08-24 was broken on nightly, so need main
     plugins-flash = {
       url = "github:folke/flash.nvim";
+      flake = false;
+    };
+    # 2026-08-27 blink has a pop up state bug where windows don't close anymore
+    # so trying trunk
+    plugins-blink-cmp = {
+      url = "github:saghen/blink.nvim";
+      flake = false;
+    };
+    plugins-blink-lib = {
+      url = "github:saghen/blink.lib";
       flake = false;
     };
   };

@@ -84,6 +84,38 @@
         "type": "github"
       }
     },
+    "plugins-blink-cmp": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1761061674,
+        "narHash": "sha256-FSfk8RF/yZqgT3OcRHkNnO+oM5YA7H0Cd6C4rGHV1uI=",
+        "owner": "saghen",
+        "repo": "blink.nvim",
+        "rev": "d1e7c7c45d45c6b6a25427bf62db4db73b03ff3d",
+        "type": "github"
+      },
+      "original": {
+        "owner": "saghen",
+        "repo": "blink.nvim",
+        "type": "github"
+      }
+    },
+    "plugins-blink-lib": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1786186962,
+        "narHash": "sha256-g8t/Esmkln3Xpsb7ln258T+XCvuMHaquct3Nnv0TbvE=",
+        "owner": "saghen",
+        "repo": "blink.lib",
+        "rev": "c8fdc12c8a2fab6cf786dd7141a283f8079f902b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "saghen",
+        "repo": "blink.lib",
+        "type": "github"
+      }
+    },
     "plugins-confirm-quit": {
       "flake": false,
       "locked": {
@@ -257,6 +289,8 @@
         "nixpkgs": "nixpkgs",
         "nixpkgs-stable": "nixpkgs-stable",
         "nixpkgs-unstable": "nixpkgs-unstable",
+        "plugins-blink-cmp": "plugins-blink-cmp",
+        "plugins-blink-lib": "plugins-blink-lib",
         "plugins-confirm-quit": "plugins-confirm-quit",
         "plugins-flash": "plugins-flash",
         "plugins-nvim-better-n": "plugins-nvim-better-n",

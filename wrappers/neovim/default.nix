@@ -471,11 +471,16 @@ in
         data =
           (lib.attrValues {
             inherit (pkgs.vimPlugins)
-              blink-cmp
               blink-cmp-conventional-commits
               blink-cmp-spell
               colorful-menu-nvim # provide additional info for completion suggestions
               luasnip
+              ;
+
+            # blink has some buggy floating window in 1.10.4, so try v2
+            inherit (config.nvim-lib.neovimPlugins)
+              blink-cmp
+              blink-lib
               ;
           })
           ++ lib.optionals config.settings.devMode (
