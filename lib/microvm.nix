@@ -1,3 +1,4 @@
+{ lib, ... }:
 {
   mkMicrovms =
     # Automatic microvm setup based on a host defining microvms
@@ -38,4 +39,17 @@
       }
     else
       { };
+
+  # Run the provided function over each of specified host's microvm specifications
+  mapHostMicrovms =
+    vms: func:
+    vms
+    |> lib.attrNames
+    |> map (
+      name:
+      let
+        vmSpecs = vms.${name}.specialArgs.vmSpecs;
+      in
+      (func vmSpecs)
+    );
 }
