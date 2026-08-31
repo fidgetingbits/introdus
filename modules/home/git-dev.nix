@@ -333,6 +333,7 @@ in
         # others
         gl = "git log";
         glo = "git log --oneline";
+        gln = "git log --name-only";
         gc = "git clone";
         gcl = "git clone $(wl-paste)"; # clone url from c[l]ipboard (can't use gcc :P)
         gcs = "git clone --depth 1"; # shallow clone
