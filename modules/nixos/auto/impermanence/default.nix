@@ -160,7 +160,7 @@ in
             ]
             ++ lib.optional cfg.autoPersistHomes (
               map (user: {
-                directory = "${if pkgs.stdenv.isDarwin then "/Users" else "/home"}/${user}";
+                directory = "${if pkgs.stdenv.hostPlatform.isDarwin then "/Users" else "/home"}/${user}";
                 inherit user;
                 group = config.users.users.${user}.group;
                 mode = "u=rwx,g=,o=";
