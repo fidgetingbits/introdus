@@ -48,7 +48,7 @@ rec {
       mac = (if opts ? "mac" && lib.isList opts.mac then opts.mac else [ opts.mac or "" ]);
       user = opts.user or "";
       sshPort = opts.sshPort or ports.tcp.ssh;
-      sshPubKey = opts.sshPubKey or "";
+      sshPubKey = opts.sshPubKey or null;
       wireguardPubKey = opts.wireguardPubKey or "";
     };
   };
