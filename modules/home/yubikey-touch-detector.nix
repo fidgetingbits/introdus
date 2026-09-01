@@ -53,6 +53,22 @@ in
       Install.WantedBy = [ "graphical-session.target" ];
     };
 
+    # Workaround for yubikey-touch-detector failing after suspend/resume.
+    # https://github.com/max-baz/yubikey-touch-detector/issues/71
+    systemd.user.services.yubikey-touch-detector-resume = {
+      Unit = {
+        Description = "Restart YubiKey touch detector after resume";
+        After = [ "suspend.target" ];
+      };
+      Service = {
+        Type = "oneshot";
+        ExecStart = "${lib.getExe' pkgs.systemd "systemctl"} --user restart yubikey-touch-detector.service";
+      };
+      Install = {
+        WantedBy = [ "suspend.target" ];
+      };
+    };
+
     # Play sound when the YubiKey is waiting for a touch
     systemd.user.services.yubikey-touch-detector-sound =
       let

@@ -58,7 +58,8 @@ lib.mkIf (config.programs ? "noctalia-shell" && config.programs.noctalia-shell.e
     };
     Timer = {
       # man systemd.time
-      OnCalendar = "*:00:00"; # hourly
+      # systemd-analyze calendar --iterations=8 '*:5/10'
+      OnCalendar = "*:5/10"; # Every 5 minutes
     };
   };
 
