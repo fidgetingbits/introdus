@@ -20,6 +20,10 @@ in
       inherit (pkgs)
         xwayland-satellite # xwayland support
         ;
+
+      inherit (pkgs.unstable)
+        nirius # extra IPC cmds https://git.sr.ht/~tsdh/nirius
+        ;
     };
     programs.uwsm = {
       enable = true;
