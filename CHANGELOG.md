@@ -2,6 +2,19 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.3.0 - 2026-09-02
+#### Features
+- (**git-dev**) support extra forges - (52f1f72) - fidgetingbits
+#### Bug Fixes
+- (**firefox**) nix wiki search typo and PDF saving - (334dac0) - fidgetingbits
+- <span style="background-color: #d73a49; color: white; padding: 2px 6px; border-radius: 3px; font-weight: bold; font-size: 0.85em;">BREAKING</span>(**neovim**) Replace deprecated mkInstallModule use - (342c1d5) - fidgetingbits
+#### Tests
+- commit sig stuff - (1242e00) - emergentmind
+#### Refactoring
+- handgrab of small fixes/tweaks - (42aea93) - emergentmind
+
+- - -
+
 ## 0.2.0 - 2026-06-25
 #### Features
 - (**firefox**) add base config with search and extensions options - (f2df36e) - emergentmind
