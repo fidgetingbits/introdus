@@ -16,6 +16,6 @@ bump:
     # https://github.com/cocogitto/cocogitto/issues/527
     # https://github.com/libgit2/libgit2/issues/6641
     #
-    @git config set user.email fidgetingbits@noreply.codeberg.org
+    @git config set user.email emergentmind@noreply.codeberg.org
     cog bump -a
     @git config unset user.email
