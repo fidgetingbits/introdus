@@ -16,6 +16,7 @@ bump:
     # https://github.com/cocogitto/cocogitto/issues/527
     # https://github.com/libgit2/libgit2/issues/6641
     #
-    @git config set user.email fidgetingbits@noreply.codeberg.org
-    cog bump -a
+    @git config set user.email $(git config user.name)@noreply.codeberg.org
+    # IMPORTANT: The - means will still unset the email even if the bump fails
+    -cog bump -a
     @git config unset user.email
