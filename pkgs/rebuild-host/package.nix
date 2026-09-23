@@ -102,7 +102,7 @@ stdenvNoCC.mkDerivation (
               --flake .#"$HOST" \
               "''${REBUILD_CMD-switch}"
           else
-            nh os switch . -- \
+            nh os "''${REBUILD_CMD-switch}" . -- \
               "''${reference_lock[@]}" \
               --impure \
               --show-trace
