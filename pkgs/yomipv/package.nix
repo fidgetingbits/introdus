@@ -56,6 +56,7 @@ let
     '';
   };
   excludedPath = "${rawSrc}/scripts/yomipv/lookup-app";
+  lookup-app-bin = "${lookup-app}/bin/lookup-app";
 in
 stdenvNoCC.mkDerivation rec {
   # buildLua {
@@ -71,7 +72,7 @@ stdenvNoCC.mkDerivation rec {
 
   postPatch = ''
     substituteInPlace lib/launcher.lua \
-      --replace-fail 'local app_path = "lookup-app"' 'local app_path = "${lookup-app}/bin/lookup-app"'
+      --replace-fail 'local app_path = "lookup-app"' 'local app_path = "${lookup-app-bin}"'
 
     if [ -f lib/platform.lua ]; then
       substituteInPlace lib/platform.lua \
@@ -85,21 +86,33 @@ stdenvNoCC.mkDerivation rec {
         'function MediaUtils.resolve_binary(binary_name)
            if binary_name == "ffmpeg" then return "${lib.getExe ffmpeg}" end
            if binary_name == "mpv" then return "${lib.getExe mpv-unwrapped}" end'
+
+    substituteInPlace lib/platform.lua \
+      --replace-fail \
+      'binary_path = Platform.normalize_path(utils.join_path(root_dir, "YomipvLookup/" .. binary_name))' \
+      'binary_path = "${lookup-app-bin}"'
+
+    substituteInPlace export/anki_db_builder.lua \
+      --replace-fail \
+        'local output_path = utils.join_path(script_dir, "../../script-opts/anki_words.json")' \
+        'local output_path = "~~/script-opts/anki_words.json"'
   '';
 
   installPhase = ''
     runHook preInstall
 
-    mkdir -p $out/share/mpv/scripts/yomipv
-    cp -r . $out/share/mpv/scripts/yomipv/
+    mkdir -p $out/share/mpv/scripts/${pname}
+    cp -r . $out/share/mpv/scripts/${pname}/
 
     mkdir -p $out/share/mpv/script-opts
     cp -r ${rawSrc}/script-opts/* $out/share/mpv/script-opts/
+    substituteInPlace $out/share/mpv/script-opts/yomipv.conf \
+        --replace-fail 'updater_enabled=yes' 'updater_enabled=no'
 
     runHook postInstall
   '';
 
-  passthru.scriptName = "main.lua";
+  passthru.scriptName = "${pname}";
 
   meta = {
     description = "An immersion-focused workflow for looking up and mining words without leaving MPV";
