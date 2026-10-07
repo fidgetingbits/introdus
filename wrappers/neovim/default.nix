@@ -291,6 +291,7 @@ in
             ctags-lsp # fallback lsp
             just-lsp
             lua-language-server # lua_ls
+            luau-lsp
             marksman # markdown
             nixd
             nix-doc

@@ -86,6 +86,7 @@ return {
   { import = MP:relpath('json') },
   { import = MP:relpath('just') },
   { import = MP:relpath('lua') },
+  { import = MP:relpath('luau') },
   { import = MP:relpath('markdown') },
   { import = MP:relpath('nix') },
   { import = MP:relpath('python') },

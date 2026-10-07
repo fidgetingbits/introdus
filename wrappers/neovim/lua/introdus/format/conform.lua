@@ -11,6 +11,7 @@ return {
           -- Conform will run multiple formatters sequentially
           -- FIXME: switch to use treefmt
           lua = { 'stylua' },
+          luau = { 'stylua' },
           kdl = { 'kdlfmt' },
           python = { 'ruff' },
           nix = { 'nixfmt' },
