@@ -45,4 +45,11 @@ rec {
       path: lib.match "nixos.nix|darwin.nix|nixos|darwin" (leaf (lib.toString path)) == null
     ) (scanPaths path);
 
+  scanPathForFileExtensions =
+    path: ext:
+    lib.map (f: (path + "/${f}")) (
+      lib.readDir path
+      |> lib.attrsets.filterAttrs (file: _type: (_type == "file" && lib.strings.hasSuffix ".${ext}" file))
+      |> lib.attrNames
+    );
 }
