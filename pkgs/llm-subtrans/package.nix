@@ -1,3 +1,4 @@
+# FIXME: Add qwen asr for local translation
 {
   lib,
   python3Packages,
@@ -41,7 +42,7 @@ let
 in
 python3Packages.buildPythonPackage rec {
   pname = "llm-subtrans";
-  version = "1.7.1";
+  version = "1.7.3";
   pyproject = true;
 
   disabled = python3Packages.pythonOlder "3.10";
@@ -50,7 +51,7 @@ python3Packages.buildPythonPackage rec {
     owner = "machinewrapped";
     repo = "llm-subtrans";
     rev = "v${version}";
-    hash = "sha256-xGW1Q33VWCWRmf5B3JPzMF/+ihs4RFJGcNB7rUnpo7w=";
+    hash = "sha256-FoQnSVd+PW+a6Ia0BmLEglR1XQ+bOFXWsqYWjO839ns=";
   };
 
   build-system = with python3Packages; [

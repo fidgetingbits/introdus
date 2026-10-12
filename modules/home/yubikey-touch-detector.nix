@@ -8,6 +8,45 @@
 }:
 let
   cfg = config.introdus.services.yubikey-touch-detector;
+  file = cfg.notificationSoundFile;
+  yubikey-play-sound = pkgs.writeShellApplication {
+    name = "yubikey-play-sound";
+    runtimeInputs = lib.attrValues { inherit (pkgs) coreutils mpv netcat; };
+    text = ''
+      # bash
+         socket="''${XDG_RUNTIME_DIR:-/run/user/$UID}/yubikey-touch-detector.socket"
+         volume="''${XDG_STATE_HOME:-$HOME/.local/state}/yubikey-sound/volume"
+         muted="''${XDG_STATE_HOME:-$HOME/.local/state}/yubikey-sound/muted"
+
+         if [[ ! -f "$volume" ]]; then
+             mkdir -p "$(dirname "$volume")"
+             echo "100" > "$volume"
+         fi
+
+         while true; do
+             if [ ! -e "$socket" ]; then
+                 printf "Waiting for YubiKey %s\n" "$socket"
+                 while [ ! -e "$socket" ]; do sleep 1; done
+             fi
+             printf "Detected %s is up\n" "$socket"
+
+             nc -U "$socket" | while read -r -n5 cmd; do
+               if [ "''${cmd:4:1}" = "1" ]; then
+                 if [[ ! -e "$muted" ]]; then
+                     printf "Playing ${file}\n"
+                     mpv --volume="$(cat "$volume")" ${file} > /dev/null
+                 else
+                     printf "Ignoring. Yubikey sounds muted\n"
+                 fi
+               else
+                 printf "Ignored yubikey command: %s\n" "$cmd"
+               fi
+             done
+
+             sleep 1
+         done
+    '';
+  };
 in
 {
   options.introdus.services.yubikey-touch-detector = {
@@ -38,7 +77,10 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    home.packages = [ pkgs.yubikey-touch-detector ];
+    home.packages = [
+      pkgs.yubikey-touch-detector
+    ]
+    ++ lib.optional cfg.notificationSound yubikey-play-sound;
 
     systemd.user.services.yubikey-touch-detector = {
       Unit = {
@@ -70,47 +112,17 @@ in
     };
 
     # Play sound when the YubiKey is waiting for a touch
-    systemd.user.services.yubikey-touch-detector-sound =
-      let
-        file = cfg.notificationSoundFile;
-        yubikey-play-sound = pkgs.writeShellApplication {
-          name = "yubikey-play-sound";
-          runtimeInputs = lib.attrValues { inherit (pkgs) coreutils mpv netcat; };
-          text = ''
-            socket="''${XDG_RUNTIME_DIR:-/run/user/$UID}/yubikey-touch-detector.socket"
-
-            while true; do
-                if [ ! -e "$socket" ]; then
-                    printf "Waiting for YubiKey %s\n" "$socket"
-                    while [ ! -e "$socket" ]; do sleep 1; done
-                fi
-                printf "Detected %s is up\n" "$socket"
-
-                nc -U "$socket" | while read -r -n5 cmd; do
-                  if [ "''${cmd:4:1}" = "1" ]; then
-                    printf "Playing ${file}\n"
-                    mpv --volume=100 ${file} > /dev/null
-                  else
-                    printf "Ignored yubikey command: %s\n" "$cmd"
-                  fi
-                done
-
-                sleep 1
-            done
-          '';
-        };
-      in
-      lib.mkIf cfg.notificationSound {
-        Unit = {
-          Description = "Play sound when the YubiKey is waiting for a touch";
-          Requires = [ "yubikey-touch-detector.service" ];
-        };
-        Service = {
-          ExecStart = lib.getExe' yubikey-play-sound "yubikey-play-sound";
-          Restart = "on-failure";
-          RestartSec = "1sec";
-        };
-        Install.WantedBy = [ "graphical-session.target" ];
+    systemd.user.services.yubikey-touch-detector-sound = lib.mkIf cfg.notificationSound {
+      Unit = {
+        Description = "Play sound when the YubiKey is waiting for a touch";
+        Requires = [ "yubikey-touch-detector.service" ];
       };
+      Service = {
+        ExecStart = lib.getExe yubikey-play-sound;
+        Restart = "on-failure";
+        RestartSec = "1sec";
+      };
+      Install.WantedBy = [ "graphical-session.target" ];
+    };
   };
 }
