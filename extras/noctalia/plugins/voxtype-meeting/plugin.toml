@@ -1,0 +1,67 @@
+id           = "fidgetingbits/voxtype-meeting"
+name         = "Voxtype Meeting"
+version      = "1.0.0"
+plugin_api   = 14
+author       = "fidgetingbits"
+license      = "MIT"
+icon         = "friends"
+description  = "Shows and controls Voxtype's meeting status from the bar."
+dependencies = ["voxtype"]
+tags         = ["audio", "bar", "indicator", "meeting", "recording", "utility"]
+
+[[widget]]
+id    = "meeting"
+entry = "widget.luau"
+
+  [widget.actions]
+  left  = "exec voxtype meeting start"
+  right = "exec voxtype meeting stop"
+
+  [[widget.setting]]
+  key             = "idle_glyph"
+  type            = "glyph"
+  label_key       = "settings.idle_glyph.label"
+  description_key = "settings.idle_glyph.description"
+  default         = "friends-off"
+
+  [[widget.setting]]
+  key             = "idle_glyph"
+  type            = "glyph"
+  label_key       = "settings.idle_glyph.label"
+  description_key = "settings.idle_glyph.description"
+  default         = "friends-off"
+
+  [[widget.setting]]
+  key             = "idle_color"
+  type            = "color"
+  label_key       = "settings.idle_color.label"
+  description_key = "settings.idle_color.description"
+  default         = "on_surface"
+
+  [[widget.setting]]
+  key             = "recording_glyph"
+  type            = "glyph"
+  label_key       = "settings.recording_glyph.label"
+  description_key = "settings.recording_glyph.description"
+  default         = "friends"
+
+  [[widget.setting]]
+  key             = "recording_color"
+  type            = "color"
+  label_key       = "settings.recording_color.label"
+  description_key = "settings.recording_color.description"
+  default         = "error"
+
+  [[widget.setting]]
+  key             = "paused_glyph"
+  type            = "glyph"
+  label_key       = "settings.paused_glyph.label"
+  description_key = "settings.paused_glyph.description"
+  default         = "friends-off"
+
+  [[widget.setting]]
+  key             = "paused_color"
+  type            = "color"
+  label_key       = "settings.paused_color.label"
+  description_key = "settings.paused_color.description"
+  default         = "tertiary"
