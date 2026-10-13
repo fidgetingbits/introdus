@@ -93,7 +93,15 @@ stdenvNoCC.mkDerivation (
             trap cleanup_flake_lock EXIT
           fi
           if [ "$HOST" != "$(hostname)" ]; then
-            # FIXME: Double check if we can use nh for this?
+            # NOTE: nh doesn't work with remote yubikey auth, so is annoying
+            # --elevation-strategy passwordless doesn't help
+            # nh os "''${REBUILD_CMD:-switch}" . \
+            #   -H "$HOST" \
+            #   --target-host "$HOST" \
+            #   -- \
+            #   "''${reference_lock[@]}" \
+            #   --impure \
+            #   --show-trace
             nixos-rebuild \
               --target-host "$HOST" \
               --sudo \
