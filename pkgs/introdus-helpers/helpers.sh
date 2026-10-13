@@ -77,7 +77,7 @@ if [ -z "${NIX_SECRETS_DIR+x}" ]; then
     red "ERROR: The NIX_SECRETS_DIR variable must point to the absolute path of your nix-secrets folder"
     red "You probably want to add it to your nixos-config shell.nix file"
 fi
-SOPS_FILE="${NIX_SECRETS_DIR}/.sops.yaml"
+SOPS_FILE="${NIX_SECRETS_DIR:-}/.sops.yaml"
 
 # Updates the .sops.yaml file with a new host or user age key.
 function sops_update_age_key() {
