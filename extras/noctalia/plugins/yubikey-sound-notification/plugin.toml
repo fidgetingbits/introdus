@@ -1,4 +1,4 @@
-id           = "fidgetingbits/yubikey-sound-notification"
+id           = "introdus/yubikey-sound-notification"
 name         = "Yubikey Sound Notification"
 version      = "1.0.0"
 plugin_api   = 14
@@ -10,7 +10,7 @@ dependencies = ["yubikey-play-sound"]
 tags         = ["yuibkey", "notification"]
 
 [[widget]]
-id    = "yubikey"
+id    = "yubikey-sound"
 entry = "widget.luau"
 
     [[widget.setting]]

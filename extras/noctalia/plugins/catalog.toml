@@ -15,7 +15,7 @@ plugin_api = 14
 tags = ["audio", "bar", "indicator", "meeting", "recording", "utility"]
 
 [[plugin]]
-id = "fidgetingbits/yubikey-sound-notification"
+id = "introdus/yubikey-sound-notification"
 name = "Yubikey Sound Notification"
 version = "1.0.0"
 updated_at = 1791205936

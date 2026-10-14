@@ -121,6 +121,10 @@
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    noctalia = {
+      url = "github:noctalia-dev/noctalia";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     ##
     # Ricing
@@ -170,8 +174,6 @@
       url = "github:folke/flash.nvim";
       flake = false;
     };
-    # 2026-08-27 blink has a pop up state bug where windows don't close anymore
-    # so trying trunk
     plugins-blink-cmp = {
       url = "github:saghen/blink.nvim";
       flake = false;
