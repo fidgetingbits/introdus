@@ -5,14 +5,16 @@ return {
     event = 'DeferredUIEnter',
     after = function(plugin)
       require('smart-splits').setup({
-        cursor_follows_swapped_bufs = true,
-        at_edge = function(ctx)
-          if ctx.direction == 'left' then
-            vim.cmd('tabprevious')
-          elseif ctx.direction == 'right' then
-            vim.cmd('tabnext')
-          end
-        end,
+        swap = { move_cursor = true },
+        move = {
+          at_edge = function(ctx)
+            if ctx.direction == 'left' then
+              vim.cmd('tabprevious')
+            elseif ctx.direction == 'right' then
+              vim.cmd('tabnext')
+            end
+          end,
+        },
       })
 
       -- stylua: ignore start
