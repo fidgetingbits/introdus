@@ -422,6 +422,8 @@ in
             shfmt
             shellharden
             nixfmt
+            statix
+            treefmt
             rustfmt
             ruff
             yamlfmt

@@ -82,47 +82,49 @@ in
     ]
     ++ lib.optional cfg.notificationSound yubikey-play-sound;
 
-    systemd.user.services.yubikey-touch-detector = {
-      Unit = {
-        Description = "Detects when your YubiKey is waiting for a touch";
+    systemd.user.services = {
+      yubikey-touch-detector = {
+        Unit = {
+          Description = "Detects when your YubiKey is waiting for a touch";
+        };
+        Service = {
+          ExecStart = "${lib.getExe' pkgs.yubikey-touch-detector "yubikey-touch-detector"} ${lib.concatStringsSep " " cfg.extraArgs}";
+          Environment = [ "PATH=${lib.makeBinPath [ pkgs.gnupg ]}" ];
+          Restart = "on-failure";
+          RestartSec = "1sec";
+        };
+        Install.WantedBy = [ "graphical-session.target" ];
       };
-      Service = {
-        ExecStart = "${lib.getExe' pkgs.yubikey-touch-detector "yubikey-touch-detector"} ${lib.concatStringsSep " " cfg.extraArgs}";
-        Environment = [ "PATH=${lib.makeBinPath [ pkgs.gnupg ]}" ];
-        Restart = "on-failure";
-        RestartSec = "1sec";
-      };
-      Install.WantedBy = [ "graphical-session.target" ];
-    };
 
-    # Workaround for yubikey-touch-detector failing after suspend/resume.
-    # https://github.com/max-baz/yubikey-touch-detector/issues/71
-    systemd.user.services.yubikey-touch-detector-resume = {
-      Unit = {
-        Description = "Restart YubiKey touch detector after resume";
-        After = [ "suspend.target" ];
+      # Workaround for yubikey-touch-detector failing after suspend/resume.
+      # https://github.com/max-baz/yubikey-touch-detector/issues/71
+      yubikey-touch-detector-resume = {
+        Unit = {
+          Description = "Restart YubiKey touch detector after resume";
+          After = [ "suspend.target" ];
+        };
+        Service = {
+          Type = "oneshot";
+          ExecStart = "${lib.getExe' pkgs.systemd "systemctl"} --user restart yubikey-touch-detector.service";
+        };
+        Install = {
+          WantedBy = [ "suspend.target" ];
+        };
       };
-      Service = {
-        Type = "oneshot";
-        ExecStart = "${lib.getExe' pkgs.systemd "systemctl"} --user restart yubikey-touch-detector.service";
-      };
-      Install = {
-        WantedBy = [ "suspend.target" ];
-      };
-    };
 
-    # Play sound when the YubiKey is waiting for a touch
-    systemd.user.services.yubikey-touch-detector-sound = lib.mkIf cfg.notificationSound {
-      Unit = {
-        Description = "Play sound when the YubiKey is waiting for a touch";
-        Requires = [ "yubikey-touch-detector.service" ];
+      # Play sound when the YubiKey is waiting for a touch
+      yubikey-touch-detector-sound = lib.mkIf cfg.notificationSound {
+        Unit = {
+          Description = "Play sound when the YubiKey is waiting for a touch";
+          Requires = [ "yubikey-touch-detector.service" ];
+        };
+        Service = {
+          ExecStart = lib.getExe yubikey-play-sound;
+          Restart = "on-failure";
+          RestartSec = "1sec";
+        };
+        Install.WantedBy = [ "graphical-session.target" ];
       };
-      Service = {
-        ExecStart = lib.getExe yubikey-play-sound;
-        Restart = "on-failure";
-        RestartSec = "1sec";
-      };
-      Install.WantedBy = [ "graphical-session.target" ];
     };
   };
 }

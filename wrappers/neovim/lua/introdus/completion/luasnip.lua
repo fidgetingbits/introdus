@@ -87,11 +87,13 @@ return {
   },
   {
     'friendly-snippets',
+    enabled = nixInfo(false, 'settings', 'devMode'),
     lazy = true,
     dep_of = { 'luasnip' },
   },
   {
     'vim-snippets',
+    enabled = nixInfo(false, 'settings', 'devMode'),
     lazy = true,
     dep_of = { 'luasnip' },
   },

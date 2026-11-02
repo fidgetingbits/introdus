@@ -14,7 +14,7 @@ return {
           luau = { 'stylua' },
           kdl = { 'kdlfmt' },
           python = { 'ruff' },
-          nix = { 'nixfmt' },
+          nix = { 'nixfmt', 'statix' },
           rust = { 'rustfmt' },
           -- IMPORTANT: shellharden is busted on a lot of scripts, so don't add here
           sh = { 'shfmt' },
