@@ -49,7 +49,7 @@ let
     runScript = "${makeWrapper}";
   };
   easylkb = stdenv.mkDerivation {
-    pname = pname;
+    inherit pname;
     version = "0-unstable-2024-04-03";
     src = pkgs.fetchFromGitHub {
       owner = "fidgetingbits";

@@ -43,7 +43,7 @@
       {
         enable = true;
         settings = {
-          preset = preset;
+          inherit preset;
           configuration = ''
             extends: ${preset}
 

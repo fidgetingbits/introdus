@@ -239,7 +239,7 @@ in
             let
               mkInclude = name: value: cond: {
                 condition = cond;
-                contents.user.email = (forgeEmail name value);
+                contents.user.email = forgeEmail name value;
               };
             in
             remotes:

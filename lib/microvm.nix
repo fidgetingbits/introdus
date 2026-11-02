@@ -50,6 +50,6 @@
       let
         vmSpecs = vms.${name}.specialArgs.vmSpecs;
       in
-      (func vmSpecs)
+      func vmSpecs
     );
 }

@@ -577,28 +577,20 @@ in
     };
 
     # https://birdeehub.github.io/nix-wrapper-modules/neovim.html#tips-and-tricks
-    specMods =
-      {
-        # parentSpec ? null,
-        # parentOpts ? null,
-        # parentName ? null,
-        # config,
-        ...
-      }:
-      {
-        # add an extraPackages field to the specs themselves
-        options.extraPackages = lib.mkOption {
-          type = lib.types.listOf wlib.types.stringable;
-          default = [ ];
-          description = "An extraPackages spec field to put packages to suffix to the PATH";
-        };
-
-        options.mainInfo = lib.mkOption {
-          type = wlib.types.attrsRecursive;
-          default = { };
-          description = "an optional mainInfo spec field to add to the main info plugin instead of the spec specific one";
-        };
+    specMods = _: {
+      # add an extraPackages field to the specs themselves
+      options.extraPackages = lib.mkOption {
+        type = lib.types.listOf wlib.types.stringable;
+        default = [ ];
+        description = "An extraPackages spec field to put packages to suffix to the PATH";
       };
+
+      options.mainInfo = lib.mkOption {
+        type = wlib.types.attrsRecursive;
+        default = { };
+        description = "an optional mainInfo spec field to add to the main info plugin instead of the spec specific one";
+      };
+    };
     runtimePkgs = config.specCollect (acc: v: acc ++ (v.extraPackages or [ ])) [ ];
 
     info = lib.mkMerge (

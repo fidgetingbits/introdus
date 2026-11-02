@@ -5,8 +5,6 @@
   # pkgs,
   ...
 }:
-let
-in
 {
   imports = [ inputs.noctalia.homeModules.default ];
   config = lib.mkIf config.programs.noctalia.enable {

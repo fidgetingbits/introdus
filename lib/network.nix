@@ -34,8 +34,8 @@ rec {
     assert (lib.length (lib.splitString "." ip)) == 4;
     {
       wildcard = replaceLastOctet ip "*";
-      prefixLength = prefixLength;
-      ip = ip;
+      inherit prefixLength;
+      inherit ip;
       cidr = "${ip}/${toString prefixLength}";
       gateway = replaceLastOctet ip "1";
       # The first three octets of the IP address
@@ -48,7 +48,7 @@ rec {
         name
         ip
         ;
-      mac = (if opts ? "mac" && lib.isList opts.mac then opts.mac else [ opts.mac or "" ]);
+      mac = if opts ? "mac" && lib.isList opts.mac then opts.mac else [ opts.mac or "" ];
       user = opts.user or "";
       sshPort = opts.sshPort or ports.tcp.ssh;
       sshPubKey = opts.sshPubKey or null;
@@ -75,7 +75,7 @@ rec {
       host.wireguardPubKey;
     allowedIPs = [ "${host.ip}/32" ];
   };
-  mkWireguardPeers = hosts: (map (host: mkWireguardPeer host) hosts);
+  mkWireguardPeers = hosts: (map mkWireguardPeer hosts);
 
   incrementLastIPOctet =
     ip:

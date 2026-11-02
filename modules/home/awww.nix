@@ -13,7 +13,7 @@ in
     enable = lib.mkEnableOption "Enable awww services";
     interval = lib.mkOption {
       type = lib.types.int;
-      default = (60 * 60); # Hourly
+      default = 60 * 60; # Hourly
       description = "Interval value for cycling between images";
     };
 
@@ -126,7 +126,7 @@ in
               # Any args passed to set_image are passed directly to awww img
               function cycle_image() {
                   types=(${lib.concatStringsSep " " cfg.transitionTypes})
-                  angles=(${lib.concatMapStringsSep " " (a: toString a) cfg.transitionAngles})
+                  angles=(${lib.concatMapStringsSep " " toString cfg.transitionAngles})
                   mapfile -t images < <(find ${cfg.wallpaperDir}/ -maxdepth 1)
 
                   # shellcheck disable=SC2068

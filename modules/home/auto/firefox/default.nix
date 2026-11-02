@@ -40,7 +40,7 @@ in
 
   config = lib.mkIf osConfig.hostSpec.useWindowManager (
     lib.mkMerge [
-      ({
+      {
         programs.firefox = {
           enable = true;
           # NOTE: configPath Set because stateVersion < 26.05
@@ -155,7 +155,7 @@ in
               };
             };
         };
-      })
+      }
       # shut up stylix warning about profile name
       (lib.mkIf osConfig.hostSpec.isAutoStyled {
         stylix.targets.firefox.profileNames = [

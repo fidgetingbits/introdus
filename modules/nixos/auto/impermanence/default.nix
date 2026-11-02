@@ -138,34 +138,32 @@ in
       # per-system lists are provided in hosts/<host>/
       environment.persistence."${config.hostSpec.persistFolder}" = {
         hideMounts = true; # Temporary disable for debugging
-        directories = (
-          lib.flatten (
-            [
-              "/var/log"
-              "/var/lib/bluetooth" # move to bluetooth-specific
-              "/var/lib/nixos"
-              "/var/lib/systemd/coredump"
-              "/etc/NetworkManager/system-connections" # move to network manager specific
+        directories = lib.flatten (
+          [
+            "/var/log"
+            "/var/lib/bluetooth" # move to bluetooth-specific
+            "/var/lib/nixos"
+            "/var/lib/systemd/coredump"
+            "/etc/NetworkManager/system-connections" # move to network manager specific
 
-              # systemd DynamicUser requires /var/{lib,cache}/private to exist and be 0700
-              {
-                directory = "/var/lib/private";
-                mode = "0700";
-              }
-              {
-                directory = "/var/cache/private";
-                mode = "0700";
-              }
+            # systemd DynamicUser requires /var/{lib,cache}/private to exist and be 0700
+            {
+              directory = "/var/lib/private";
+              mode = "0700";
+            }
+            {
+              directory = "/var/cache/private";
+              mode = "0700";
+            }
 
-            ]
-            ++ lib.optional cfg.autoPersistHomes (
-              map (user: {
-                directory = "${if pkgs.stdenv.hostPlatform.isDarwin then "/Users" else "/home"}/${user}";
-                inherit user;
-                group = config.users.users.${user}.group;
-                mode = "u=rwx,g=,o=";
-              }) config.hostSpec.users
-            )
+          ]
+          ++ lib.optional cfg.autoPersistHomes (
+            map (user: {
+              directory = "${if pkgs.stdenv.hostPlatform.isDarwin then "/Users" else "/home"}/${user}";
+              inherit user;
+              group = config.users.users.${user}.group;
+              mode = "u=rwx,g=,o=";
+            }) config.hostSpec.users
           )
         );
 

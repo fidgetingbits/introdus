@@ -36,7 +36,7 @@ in
       description = "Username of smtp user";
     };
     smtpPort = lib.mkOption {
-      default = (if cfg.useRelay then 25 else 587);
+      default = if cfg.useRelay then 25 else 587;
       type = lib.types.int;
       description = "Port number for smtp server";
     };
@@ -51,7 +51,7 @@ in
       members = [ cfg.user ] ++ cfg.extraUsers;
     };
     sops.secrets."${secret}" = {
-      group = cfg.group;
+      inherit (cfg) group;
       mode = "0440";
     };
     programs.msmtp = {

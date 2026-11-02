@@ -118,7 +118,7 @@ let
 
         sed -E "${
           lib.attrNames cfg.typeColors
-          |> lib.map (c: typeMatch c)
+          |> lib.map typeMatch
           # nixfmt hack
           |> lib.concatStringsSep ";"
         } ; ${scopeMatch}"
@@ -132,7 +132,7 @@ in
       colorType = lib.types.coercedTo lib.types.str lib.toUpper (
         lib.types.addCheck lib.types.str (s: lib.elem s supportedColors)
       );
-      colorTypes = (lib.types.attrsOf colorType);
+      colorTypes = lib.types.attrsOf colorType;
       colorTypesCheck = attrs: lib.all (name: lib.hasAttr name defaultTypeColors) (lib.attrNames attrs);
     in
     {

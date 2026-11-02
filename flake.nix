@@ -10,7 +10,7 @@
       ...
     }@inputs:
     let
-      lib = nixpkgs.lib;
+      inherit (nixpkgs) lib;
     in
     flake-parts.lib.mkFlake { inherit inputs; } {
       flake = {

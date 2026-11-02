@@ -7,7 +7,7 @@
   ...
 }:
 let
-  lib = pkgs.lib;
+  inherit (pkgs) lib;
   introdusLib = self.lib.mkIntrodusLib { inherit lib; };
 in
 {

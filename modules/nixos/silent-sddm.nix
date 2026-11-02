@@ -26,7 +26,7 @@ in
 
     programs.silentSDDM = {
       enable = true;
-      theme = cfg.theme;
+      inherit (cfg) theme;
       settings.General =
         let
           greeterEnvVars = lib.flatten (
