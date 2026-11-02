@@ -28,7 +28,10 @@
       };
     };
 
-    statix.enable = true;
+    statix = {
+      enable = true;
+      settings.config = ".statix.toml"; # (disables repeated_keys, ignores)
+    };
 
     # shellscripts
     shellcheck.enable = true;
