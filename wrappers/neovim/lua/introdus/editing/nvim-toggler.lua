@@ -2,6 +2,16 @@ return {
   {
     'nvim-toggler',
     lazy = false,
+    keys = {
+      {
+        '<leader>i',
+        function()
+          require('nvim-toggler').toggle()
+        end,
+        mode = { 'n', 'x' },
+        desc = 'Toggle Value',
+      },
+    },
     after = function(plugin)
       require('nvim-toggler').setup({
         remove_default_inverses = true,
