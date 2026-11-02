@@ -29,15 +29,18 @@ rec {
     # nixfmt hack
     |> lib.last;
 
-  makeSubnet = ip: prefixLength: {
-    wildcard = replaceLastOctet ip "*";
-    prefixLength = prefixLength;
-    ip = ip;
-    cidr = "${ip}/${toString prefixLength}";
-    gateway = replaceLastOctet ip "1";
-    # The first three octets of the IP address
-    triplet = triplet ip;
-  };
+  makeSubnet =
+    ip: prefixLength:
+    assert (lib.length (lib.splitString "." ip)) == 4;
+    {
+      wildcard = replaceLastOctet ip "*";
+      prefixLength = prefixLength;
+      ip = ip;
+      cidr = "${ip}/${toString prefixLength}";
+      gateway = replaceLastOctet ip "1";
+      # The first three octets of the IP address
+      triplet = triplet ip;
+    };
 
   makeHost = opts: {
     ${opts.name} = {

@@ -47,9 +47,11 @@ rec {
 
   scanPathForFileExtensions =
     path: ext:
-    lib.map (f: (path + "/${f}")) (
-      lib.readDir path
-      |> lib.attrsets.filterAttrs (file: _type: (_type == "file" && lib.strings.hasSuffix ".${ext}" file))
-      |> lib.attrNames
+    lib.optionals (lib.pathExists path) (
+      lib.map (f: (path + "/${f}")) (
+        lib.readDir path
+        |> lib.attrsets.filterAttrs (file: _type: (_type == "file" && lib.strings.hasSuffix ".${ext}" file))
+        |> lib.attrNames
+      )
     );
 }
