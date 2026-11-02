@@ -28,6 +28,8 @@
       };
     };
 
+    statix.enable = true;
+
     # shellscripts
     shellcheck.enable = true;
 
@@ -57,7 +59,7 @@
     end-of-file-fixer.enable = true;
 
     unwanted-builtins = {
-      enable = true;
+      enable = false;
       name = "unwanted builtins function calls";
       entry = lib.getExe' pkgs.introdus.unwanted-builtins "unwanted-builtins";
       files = "\\.nix$";
