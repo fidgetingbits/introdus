@@ -31,6 +31,11 @@ return {
             args = { 'format', '--kdl-version', 'v1', '--stdin' },
             stdin = true,
           },
+          statix = {
+            command = 'statix',
+            args = { 'fix', '--stdin' },
+            stdin = true,
+          },
         },
         format_on_save = function(bufnr)
           -- Disable with a global or buffer-local variable
