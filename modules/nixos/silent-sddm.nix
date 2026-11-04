@@ -22,7 +22,7 @@ in
   config = lib.mkIf cfg.enable {
     # Use X11 because SDDM+Wayland fails to run properly on multiple hosts
     # with Radeon 9070
-    introdus.services.x11.enable = true;
+    # introdus.services.x11.enable = true;
 
     programs.silentSDDM = {
       enable = true;
