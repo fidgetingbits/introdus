@@ -51,7 +51,7 @@ local telescope_ignore_patterns = {
 -- From https://github.com/nvim-telescope/telescope.nvim/issues/2874#issuecomment-1900967890
 local function custom_find_files(opts, no_ignore)
   opts = opts or {}
-  no_ignore = vim.F.if_nil(no_ignore, false)
+  no_ignore = vim.nonnil(no_ignore, false)
   opts.attach_mappings = function(_, map)
     map({ 'n', 'i' }, '<C-h>', function(prompt_bufnr) -- <C-h> to toggle modes
       local prompt = require('telescope.actions.state').get_current_line()
