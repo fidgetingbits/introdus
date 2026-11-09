@@ -189,8 +189,8 @@ in
   config = {
     # Build a neovide wrapper
     hosts.neovide.nvim-host.enable = config.settings.neovide;
-    # This is because noice complains due to this:
-    # https://github.com/neovide/neovide/blob/ba8c41f423c9a8f0cb14ff19baa6f538c95e52bf/website/docs/command-line-reference.md?plain=1#L225
+    # noice complains due to this:
+    # https://github.com/neovide/neovide/blob/ba8c41f4/website/docs/command-line-reference.md?plain=1#L225
     hosts.neovide.nvim-host.flags."--no-startup-message-capture" = true;
 
     settings.config_directory =
@@ -309,7 +309,7 @@ in
         lazy = true;
         data =
           lib.attrValues {
-            inherit (pkgs.vimPlugins)
+            inherit (pkgs.unstable.vimPlugins)
               telescope-nvim
               telescope-fzf-native-nvim
               telescope-ui-select-nvim
@@ -549,7 +549,7 @@ in
                 ;
             }
             ++ [
-              (pkgs.vimPlugins.nvim-treesitter.withPlugins (
+              (pkgs.unstable.vimPlugins.nvim-treesitter.withPlugins (
                 plugins: with plugins; [
                   bash
                   html
