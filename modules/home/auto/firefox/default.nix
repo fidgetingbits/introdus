@@ -36,6 +36,11 @@ in
       default = [ ];
       example = "[ (import ./extraSearch.nix { inherit lib; }) ]";
     };
+    autoRestart = lib.mkOption {
+      description = "Auto restart firefox if it is closed. Useful for media boxes, etc";
+      type = lib.types.bool;
+      default = false;
+    };
   };
 
   config = lib.mkIf osConfig.hostSpec.useWindowManager (
@@ -96,6 +101,7 @@ in
               #  "*" = {
               #  installation_mode = "blocked";
               #  blocked_install_message = "Install your extensions with Nix";
+              # };
             };
           };
           profiles =
@@ -132,6 +138,10 @@ in
                 # "javascript.options.wasm" = false;
                 # "javascript.options.asmjs" = false;
                 # "webgl.disabled" = true;
+
+                # Disable alt to trigger file menu
+                "ui.key.menuAccessKey" = 0;
+                "ui.key.menuAccessKeyFocuses" = false;
               };
             in
             {
@@ -140,6 +150,11 @@ in
                 name = cfg.profileName;
                 isDefault = true;
                 settings = commonSettings;
+                # Allow us to load javascript for some custom keybinds
+                extraConfig = ''
+                  user_pref("general.config.filename", "firefox.cfg");
+                  user_pref("general.config.obscure_value", 0);
+                '';
                 extensions = lib.mkMerge (
                   lib.flatten [
                     (import ./extensions.nix { inherit pkgs inputs lib; })
@@ -155,6 +170,62 @@ in
               };
             };
         };
+
+        # Keep firefox running if it's closed
+        systemd.user.services = lib.optionalAttrs cfg.autoRestart {
+          firefox = {
+            Unit = {
+              description = "Firefox Browser";
+              After = [
+                "graphical-session.target"
+                "graphical-session-pre.target"
+              ];
+              PartOf = [ "graphical-session.target" ];
+            };
+            Install.WantedBy = [ "graphical-session.target" ];
+            Service = {
+              Type = "simple";
+              ExecStart = "${config.home.homeDirectory}.nix-profile/bin/firefox";
+              Restart = "always";
+              RestartSec = 5;
+            };
+          };
+        };
+
+        # home.file.".mozilla/firefox/firefox.cfg".text = ''
+        #   // Modern Firefox Autoconfig - First line must be a comment
+        #   const { ChromeUtils } = globalThis;
+        #   const { Services } = ChromeUtils.importESModule("resource://gre/modules/Services.sys.mjs");
+        #
+        #   function overrideSidebarShortcut(win) {
+        #     win.addEventListener("DOMContentLoaded", () => {
+        #       // Modern sidebar key elements
+        #       let sidebarKey = win.document.getElementById("key_sidebar")
+        #                     || win.document.getElementById("key_toggleSidebar")
+        #                     || win.document.getElementById("viewBookmarksSidebarKb");
+        #
+        #       if (sidebarKey) {
+        #         sidebarKey.setAttribute("key", "z");
+        #         sidebarKey.setAttribute("modifiers", "control,alt");
+        #       } else {
+        #         // Fallback for newer sidebar architecture: attach listener directly to mainKeyset
+        #         let mainKeyset = win.document.getElementById("mainKeyset");
+        #         if (mainKeyset) {
+        #           let newKey = win.document.createXULElement("key");
+        #           newKey.setAttribute("id", "key_custom_sidebar_toggle");
+        #           newKey.setAttribute("key", "z");
+        #           newKey.setAttribute("modifiers", "control,alt");
+        #           newKey.setAttribute("oncommand", "SidebarController.toggle();");
+        #           mainKeyset.appendChild(newKey);
+        #         }
+        #       }
+        #     }, { once: true });
+        #   }
+        #
+        #   Services.obs.addObserver((subject) => {
+        #     overrideSidebarShortcut(subject);
+        #   }, "chrome-document-global-created", false);
+        # '';
       }
       # shut up stylix warning about profile name
       (lib.mkIf osConfig.hostSpec.isAutoStyled {
