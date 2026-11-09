@@ -12,14 +12,16 @@ vim.api.nvim_create_autocmd('FileType', {
 local highlight_group = vim.api.nvim_create_augroup('YankHighlight', { clear = true })
 vim.api.nvim_create_autocmd('TextYankPost', {
   callback = function()
-    vim.hl.hl_op({ higroup = 'Visual', timeout = 300 })
-  end,
-  group = highlight_group,
-  pattern = '*',
-})
-vim.api.nvim_create_autocmd('TextPutPost', {
-  callback = function()
-    vim.hl.hl_op({ higroup = 'Visual', timeout = 300 })
+    -- FIXME: Re-enable below after neovim 0.13
+    vim.hl.on_yank()
+    --     vim.hl.hl_op({ higroup = 'Visual', timeout = 300 })
+    --   end,
+    --   group = highlight_group,
+    --   pattern = '*',
+    -- })
+    -- vim.api.nvim_create_autocmd('TextPutPost', {
+    --   callback = function()
+    --     vim.hl.hl_op({ higroup = 'Visual', timeout = 300 })
   end,
   group = highlight_group,
   pattern = '*',
