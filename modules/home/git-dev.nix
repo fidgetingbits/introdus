@@ -310,6 +310,9 @@ in
         gswc = "git switch -c";
         gco = "git checkout";
 
+        # git branch
+        gb = "git branch";
+
         # git fetch
         gf = "git fetch";
         gfa = "git fetch --all";
@@ -344,6 +347,7 @@ in
     };
 
     home = {
+      packages = lib.attrValues { inherit (pkgs) worktrunk jujutsu; };
       file.".ssh/allowed_signers".text =
         let
           # FIXME: This should integrate cfg.devMails and check cfg.usePrivateEmails
