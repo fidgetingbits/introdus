@@ -102,6 +102,8 @@ stdenvNoCC.mkDerivation (
             #   "''${reference_lock[@]}" \
             #   --impure \
             #   --show-trace
+
+            # FIXME: Dropping --sudo seems to be required way on a minimal to full build, not sure why
             nixos-rebuild \
               --target-host "$HOST" \
               --sudo \
