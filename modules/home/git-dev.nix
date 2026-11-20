@@ -281,7 +281,8 @@ in
         # Order matters. Last match wins, so we want granular email changes last
         (mapFolders cfg.devFolders privateGitConfig)
         ++ (mapFolders cfg.workFolders workGitConfig)
-        ++ (mapRemotes (forges // cfg.extraForges) ++ (mapPrivateRemotes cfg.workForges));
+        ++ (mapRemotes (forges // cfg.extraForges))
+        ++ (mapPrivateRemotes cfg.workForges);
 
       signing = {
         signByDefault = true;
