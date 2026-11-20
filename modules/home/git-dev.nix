@@ -44,6 +44,8 @@ let
     domain:
     lib.optionals (osConfig.hostSpec.isWork && (cfg.workRepos ? ${domain})) cfg.workRepos.${domain};
 
+  # FIXME: This should take an explicit list of work domains instead of deriving from workDomain only, in
+  # case it's not a public forge.
   alwaysSshRepos =
     (lib.attrNames cfg.devRepos) ++ workRepoNames
     |> lib.map (domain: insteadOfList domain (cfg.devRepos.${domain} ++ (workDomain domain)))
@@ -127,12 +129,17 @@ in
         type = lib.types.listOf lib.types.str;
         description = "List of folders to set your work dev git settings";
       };
-      workServers = lib.mkOption {
-        default = [ ];
-        example = [ "git.work-server.com" ];
-        type = lib.types.listOf lib.types.str;
-        description = "List of work servers to include ssh insteadOf url substitutions for";
+
+      workForges = lib.mkOption {
+        type = lib.types.attrsOf lib.types.str;
+        default = {
+        };
+        example = {
+          "gitee.com" = "users.noreply";
+        };
+        description = "Additional set of forges and emails";
       };
+
       workRepos = lib.mkOption {
         default = { };
         example = {
@@ -235,6 +242,7 @@ in
               condition = "gitdir:${f}";
               inherit contents;
             }) paths;
+          # Like mapRemotes, but don't construct a new email
           mapRemotes =
             let
               mkInclude = name: value: cond: {
@@ -251,11 +259,29 @@ in
               ]
             )
             |> lib.flatten;
+
+          # FIXME: should just change the way the emails are generated and re-use mapRemotes
+          mapPrivateRemotes =
+            let
+              mkInclude = name: value: cond: {
+                condition = cond;
+                contents.user.email = value;
+              };
+            in
+            remotes:
+            remotes
+            |> lib.mapAttrsToList (
+              name: value: [
+                (mkInclude name value "hasconfig:remote.*.url:**/*${name}/**")
+                (mkInclude name value "hasconfig:remote.*.url:git@${name}:*/**")
+              ]
+            )
+            |> lib.flatten;
         in
         # Order matters. Last match wins, so we want granular email changes last
         (mapFolders cfg.devFolders privateGitConfig)
         ++ (mapFolders cfg.workFolders workGitConfig)
-        ++ (mapRemotes (forges // cfg.extraForges));
+        ++ (mapRemotes (forges // cfg.extraForges) ++ (mapPrivateRemotes cfg.workForges));
 
       signing = {
         signByDefault = true;
